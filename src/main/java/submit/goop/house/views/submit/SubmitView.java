@@ -10,67 +10,167 @@ import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
+import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import javax.annotation.security.RolesAllowed;
-import submit.goop.house.data.entity.SamplePerson;
-import submit.goop.house.data.service.SamplePersonService;
+import javax.persistence.Lob;
+
+import io.swagger.models.auth.In;
+import org.apache.commons.io.FileUtils;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import submit.goop.house.data.entity.GoopUser;
+import submit.goop.house.data.entity.Submission;
+import submit.goop.house.data.service.GoopUserService;
+import submit.goop.house.data.service.SubmissionService;
 import submit.goop.house.views.MainLayout;
 
-@PageTitle("Submit")
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.UUID;
+
+@PageTitle("Manage Active Submission or new Submission")
 @Route(value = "submit", layout = MainLayout.class)
 @RolesAllowed("user")
 @Uses(Icon.class)
 public class SubmitView extends Div {
 
-    private TextField firstName = new TextField("First name");
-    private TextField lastName = new TextField("Last name");
-    private EmailField email = new EmailField("Email address");
-    private DatePicker dateOfBirth = new DatePicker("Birthday");
-    private PhoneNumberField phone = new PhoneNumberField("Phone number");
-    private TextField occupation = new TextField("Occupation");
+    private TextField mainArtist = new TextField("Artist Name");
+    private TextField title = new TextField("Title");
+    private TextField coverArt = new TextField("Cover Art");
+    private TextField audioFileURL = new TextField("Audio File URL");
+    //private TextField submissionID = new TextField("Submission ID");
+    private UUID submissionID = UUID.randomUUID();
 
     private Button cancel = new Button("Cancel");
     private Button save = new Button("Save");
 
-    private Binder<SamplePerson> binder = new Binder(SamplePerson.class);
+    private Binder<Submission> binder = new Binder(Submission.class);
 
-    public SubmitView(SamplePersonService personService) {
+    private MemoryBuffer audioMemoryBuffer = new MemoryBuffer();
+    private MemoryBuffer artMemoryBuffer = new MemoryBuffer();
+
+    private Upload audioUpload = new Upload(audioMemoryBuffer);
+    private Upload artUpload = new Upload(artMemoryBuffer);
+    private H4 audioUploadLabel = new H4("Audio File");
+    private H4 artUploadLabel = new H4("Optional Artwork");
+
+    public SubmitView(SubmissionService submissionService) {
         addClassName("submit-view");
 
         add(createTitle());
         add(createFormLayout());
+        add(createUploadLayout());
         add(createButtonLayout());
 
         binder.bindInstanceFields(this);
         clearForm();
 
+
+
         cancel.addClickListener(e -> clearForm());
         save.addClickListener(e -> {
-            personService.update(binder.getBean());
+            submissionService.update(binder.getBean());
             Notification.show(binder.getBean().getClass().getSimpleName() + " details stored.");
             clearForm();
         });
+
+        audioUpload.addSucceededListener(e -> {
+            String fileName = submissionID + " || " + e.getFileName();
+            Submission submission = binder.getBean();
+            //submission.setAudioFileURL("/uploads/audio/" + fileName);
+            submission.setSubmissionID(this.submissionID);
+            audioFileURL.setValue("/uploads/audio/" + fileName);
+            InputStream inputStream = audioMemoryBuffer.getInputStream();
+            try {
+                saveAudioFileToDisk(inputStream, fileName);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        } );
+        artUpload.addSucceededListener(e -> {
+            String fileName = submissionID.toString() + " || " + e.getFileName();
+            coverArt.setValue("/uploads/art/" + fileName);
+            InputStream inputStream = artMemoryBuffer.getInputStream();
+            try {
+                saveArtFileToDisk(inputStream, fileName);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        } );
+
+        audioUpload.addFileRejectedListener(event -> {
+            String errorMessage = event.getErrorMessage();
+
+            Notification notification = Notification.show(
+                    errorMessage,
+                    5000,
+                    Notification.Position.MIDDLE
+            );
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        });
+
+        artUpload.addFileRejectedListener(event -> {
+            String errorMessage = event.getErrorMessage();
+
+            Notification notification = Notification.show(
+                    errorMessage,
+                    5000,
+                    Notification.Position.MIDDLE
+            );
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        });
+    }
+
+    private String saveAudioFileToDisk(InputStream inputStream, String fileName) throws IOException {
+        File file = new File("/Users/bardia/IdeaProjects/goop-house-submissions/uploads/audio/", fileName);
+        FileUtils.copyInputStreamToFile(inputStream, file);
+        return file.getAbsolutePath();
+    }
+    private String saveArtFileToDisk(InputStream inputStream, String fileName) throws IOException {
+        File file = new File("/Users/bardia/IdeaProjects/goop-house-submissions/uploads/art/", fileName);
+        FileUtils.copyInputStreamToFile(inputStream, file);
+        return file.getAbsolutePath();
     }
 
     private void clearForm() {
-        binder.setBean(new SamplePerson());
+        binder.setBean(new Submission());
     }
 
     private Component createTitle() {
-        return new H3("Personal information");
+        return new H3("Your Submission");
     }
 
     private Component createFormLayout() {
         FormLayout formLayout = new FormLayout();
-        email.setErrorMessage("Please enter a valid email address");
-        formLayout.add(firstName, lastName, dateOfBirth, phone, email, occupation);
+
+        //email.setErrorMessage("Please enter a valid email address");
+        mainArtist.setRequiredIndicatorVisible(true);
+        mainArtist.setErrorMessage("This field is required");
+        mainArtist.setRequired(true);
+        title.setRequiredIndicatorVisible(true);
+        title.setErrorMessage("This field is required");
+        title.setRequired(true);
+        audioFileURL.setRequiredIndicatorVisible(true);
+        audioFileURL.setRequired(true);
+        audioFileURL.setErrorMessage("This field is required");
+        audioFileURL.setReadOnly(true);
+        coverArt.setReadOnly(true);
+        //submissionID.setReadOnly(true);
+        //submissionID.setValue(UUID.randomUUID().toString());
+        formLayout.add(mainArtist, title, audioFileURL, coverArt);
         return formLayout;
     }
 
@@ -83,6 +183,18 @@ public class SubmitView extends Div {
         return buttonLayout;
     }
 
+    private Component createUploadLayout(){
+        HorizontalLayout uploadLayout = new HorizontalLayout();
+        uploadLayout.addClassName("upload-layout");
+        audioUpload.setDropAllowed(true);
+        artUpload.setDropAllowed(true);
+        //audioUpload.setAcceptedFileTypes("audio/mp3", "audio/mpeg", "audio/wav", "audio/x-wav", "audio/ogg", "audio/webm");
+        //artUpload.setAcceptedFileTypes("image/png", "image/jpeg", "image/jpg", "image/gif", "image/tiff", "image/svg+xml", "image/webp");
+        uploadLayout.add(audioUploadLabel, audioUpload);
+        uploadLayout.add(artUploadLabel, artUpload);
+        return uploadLayout;
+    }
+
     private static class PhoneNumberField extends CustomField<String> {
         private ComboBox<String> countryCode = new ComboBox<>();
         private TextField number = new TextField();
@@ -93,7 +205,7 @@ public class SubmitView extends Div {
             countryCode.setPlaceholder("Country");
             countryCode.setPattern("\\+\\d*");
             countryCode.setPreventInvalidInput(true);
-            countryCode.setItems("+354", "+91", "+62", "+98", "+964", "+353", "+44", "+972", "+39", "+225");
+            countryCode.setItems("+1", "+91", "+62", "+98", "+964", "+353", "+44", "+972", "+39", "+225");
             countryCode.addCustomValueSetListener(e -> countryCode.setValue(e.getDetail()));
             number.setPattern("\\d*");
             number.setPreventInvalidInput(true);

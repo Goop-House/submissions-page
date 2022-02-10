@@ -60,6 +60,7 @@ public class DataGenerator {
             submissionRepositoryGenerator.setData(Submission::setAudioFileURL, DataType.PROFILE_PICTURE_URL);
             submissionRepositoryGenerator.setData(Submission::setSubmissionID, DataType.UUID);
             submissionRepositoryGenerator.setData(Submission::setMainArtist, DataType.FIRST_NAME);
+            submissionRepositoryGenerator.setData(Submission::setTitle, DataType.WORD);
             submissionRepository.saveAll(submissionRepositoryGenerator.create(100, seed));
 
             logger.info("... generating 100 Goop User entities...");

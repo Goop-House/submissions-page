@@ -88,24 +88,20 @@ public class AllSubmissionsView extends Div implements BeforeEnterObserver {
         avatarGroup = new CollaborationAvatarGroup(userInfo, null);
         avatarGroup.getStyle().set("visibility", "hidden");
 
+
         createGridLayout(splitLayout);
         createEditorLayout(splitLayout);
 
         add(splitLayout);
 
         // Configure Grid
-        LitRenderer<Submission> coverArtRenderer = LitRenderer.<Submission>of(
-                "<span style='border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; width: 64px; height: 64px'><img style='max-width: 100%' src=${item.coverArt} /></span>")
-                .withProperty("coverArt", Submission::getCoverArt);
-        grid.addColumn(coverArtRenderer).setHeader("Cover Art").setWidth("96px").setFlexGrow(0);
 
-        LitRenderer<Submission> audioFileURLRenderer = LitRenderer.<Submission>of(
-                "<span style='border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; width: 64px; height: 64px'><img style='max-width: 100%' src=${item.audioFileURL} /></span>")
-                .withProperty("audioFileURL", Submission::getAudioFileURL);
-        grid.addColumn(audioFileURLRenderer).setHeader("Audio File URL").setWidth("96px").setFlexGrow(0);
+        grid.addColumn("coverArt").setAutoWidth(true);
+        grid.addColumn("audioFileURL").setAutoWidth(true);
 
         grid.addColumn("submissionID").setAutoWidth(true);
         grid.addColumn("mainArtist").setAutoWidth(true);
+        grid.addColumn("title").setAutoWidth(true);
         grid.setItems(query -> submissionService.list(
                 PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
                 .stream());

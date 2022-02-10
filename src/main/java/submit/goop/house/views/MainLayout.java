@@ -149,13 +149,13 @@ public class MainLayout extends AppLayout {
 
                 new MenuItemInfo("All Users", "la la-user", AllUsersView.class), //
 
-                new MenuItemInfo("Users", "la la-user-astronaut", UsersView.class), //
+                //new MenuItemInfo("Users", "la la-user-astronaut", UsersView.class), //
 
                 new MenuItemInfo("My Info", "la la-user", MyInfoView.class), //
 
                 new MenuItemInfo("My Submissions", "la la-th-list", MySubmissionsView.class), //
 
-                new MenuItemInfo("Submit", "la la-upload", SubmitView.class), //
+                new MenuItemInfo("Manage Active Submission or New Submission", "la la-upload", SubmitView.class), //
 
         };
     }

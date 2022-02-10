@@ -14,6 +14,7 @@ public class Submission extends AbstractEntity {
     private String audioFileURL;
     private UUID submissionID;
     private String mainArtist;
+    private String title;
 
     public String getCoverArt() {
         return coverArt;
@@ -39,5 +40,6 @@ public class Submission extends AbstractEntity {
     public void setMainArtist(String mainArtist) {
         this.mainArtist = mainArtist;
     }
-
+    public String getTitle() {return title;}
+    public void setTitle(String title) {this.title = title;}
 }
