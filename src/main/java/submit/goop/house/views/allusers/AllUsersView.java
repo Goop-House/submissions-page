@@ -127,8 +127,8 @@ public class AllUsersView extends Div implements BeforeEnterObserver {
         binder = new CollaborationBinder<>(GoopUser.class, userInfo);
 
         // Bind fields. This is where you'd define e.g. validation rules
-        binder.forField(discordID, String.class).withConverter(new StringToUuidConverter("Invalid UUID"))
-                .bind("discordID");
+//        binder.forField(discordID, String.class).withConverter(new StringToUuidConverter("Invalid UUID"))
+//                .bind("discordID");
 
         binder.bindInstanceFields(this);
 

@@ -66,7 +66,7 @@ public class DataGenerator {
             logger.info("... generating 100 Goop User entities...");
             ExampleDataGenerator<GoopUser> goopUserRepositoryGenerator = new ExampleDataGenerator<>(GoopUser.class,
                     LocalDateTime.of(2022, 2, 2, 0, 0, 0));
-            goopUserRepositoryGenerator.setData(GoopUser::setDiscordID, DataType.UUID);
+            goopUserRepositoryGenerator.setData(GoopUser::setDiscordID, DataType.WORD);
             goopUserRepositoryGenerator.setData(GoopUser::setArtistName, DataType.FIRST_NAME);
             goopUserRepositoryGenerator.setData(GoopUser::setPronouns, DataType.WORD);
             goopUserRepositoryGenerator.setData(GoopUser::setEmail, DataType.EMAIL);

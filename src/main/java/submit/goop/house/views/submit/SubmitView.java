@@ -64,15 +64,15 @@ public class SubmitView extends Div {
 
     private Upload audioUpload = new Upload(audioMemoryBuffer);
     private Upload artUpload = new Upload(artMemoryBuffer);
-    private H4 audioUploadLabel = new H4("Audio File");
-    private H4 artUploadLabel = new H4("Optional Artwork");
+    //private H4 audioUploadLabel = new H4("Audio File");
+    //private H4 artUploadLabel = new H4("Optional Artwork");
 
     public SubmitView(SubmissionService submissionService) {
         addClassName("submit-view");
 
         add(createTitle());
         add(createFormLayout());
-        add(createUploadLayout());
+        //add(createUploadLayout());
         add(createButtonLayout());
 
         binder.bindInstanceFields(this);
@@ -168,9 +168,14 @@ public class SubmitView extends Div {
         audioFileURL.setErrorMessage("This field is required");
         audioFileURL.setReadOnly(true);
         coverArt.setReadOnly(true);
+
+        audioUpload.setDropAllowed(true);
+        artUpload.setDropAllowed(true);
+        //audioUpload.setAcceptedFileTypes("audio/mp3", "audio/mpeg", "audio/wav", "audio/x-wav", "audio/ogg", "audio/webm");
+        //artUpload.setAcceptedFileTypes("image/png", "image/jpeg", "image/jpg", "image/gif", "image/tiff", "image/svg+xml", "image/webp");
         //submissionID.setReadOnly(true);
         //submissionID.setValue(UUID.randomUUID().toString());
-        formLayout.add(mainArtist, title, audioFileURL, coverArt);
+        formLayout.add(mainArtist, title, audioFileURL, coverArt, audioUpload, artUpload);
         return formLayout;
     }
 
@@ -190,8 +195,8 @@ public class SubmitView extends Div {
         artUpload.setDropAllowed(true);
         //audioUpload.setAcceptedFileTypes("audio/mp3", "audio/mpeg", "audio/wav", "audio/x-wav", "audio/ogg", "audio/webm");
         //artUpload.setAcceptedFileTypes("image/png", "image/jpeg", "image/jpg", "image/gif", "image/tiff", "image/svg+xml", "image/webp");
-        uploadLayout.add(audioUploadLabel, audioUpload);
-        uploadLayout.add(artUploadLabel, artUpload);
+        uploadLayout.add(/*audioUploadLabel,*/ audioUpload);
+        uploadLayout.add(/*artUploadLabel,*/ artUpload);
         return uploadLayout;
     }
 

@@ -7,7 +7,7 @@ import submit.goop.house.data.AbstractEntity;
 @Entity
 public class GoopUser extends AbstractEntity {
 
-    private UUID discordID;
+    private String discordID;
     private String artistName;
     private String pronouns;
     private String email;
@@ -15,10 +15,10 @@ public class GoopUser extends AbstractEntity {
     private String submissions;
     private boolean activeSubmission;
 
-    public UUID getDiscordID() {
+    public String getDiscordID() {
         return discordID;
     }
-    public void setDiscordID(UUID discordID) {
+    public void setDiscordID(String discordID) {
         this.discordID = discordID;
     }
     public String getArtistName() {

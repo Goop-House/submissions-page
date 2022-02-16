@@ -15,6 +15,7 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.html.UnorderedList;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import java.util.Optional;
 import submit.goop.house.data.entity.User;
@@ -85,6 +86,8 @@ public class MainLayout extends AppLayout {
         this.accessChecker = accessChecker;
 
         addToNavbar(createHeaderContent());
+
+
     }
 
     private Component createHeaderContent() {
