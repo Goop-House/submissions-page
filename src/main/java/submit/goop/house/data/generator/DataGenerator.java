@@ -46,36 +46,47 @@ public class DataGenerator {
             user.setRoles(Collections.singleton(Role.USER));
             userRepository.save(user);
             User admin = new User();
-            admin.setName("Emma Powerful");
-            admin.setUsername("admin");
+            admin.setName("TheLickIn13Keys#7977");
+            admin.setUsername("620845493957951498");
             admin.setHashedPassword(passwordEncoder.encode("admin"));
             admin.setProfilePictureUrl(
-                    "https://images.unsplash.com/photo-1607746882042-944635dfe10e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=128&h=128&q=80");
+                    "https://github.com/TheLickIn13Keys/profile-pictures/blob/main/kirbypfp.png?raw=true");
             admin.setRoles(Stream.of(Role.USER, Role.ADMIN).collect(Collectors.toSet()));
             userRepository.save(admin);
-            logger.info("... generating 100 Submission entities...");
-            ExampleDataGenerator<Submission> submissionRepositoryGenerator = new ExampleDataGenerator<>(
-                    Submission.class, LocalDateTime.of(2022, 2, 2, 0, 0, 0));
-            submissionRepositoryGenerator.setData(Submission::setCoverArt, DataType.PROFILE_PICTURE_URL);
-            submissionRepositoryGenerator.setData(Submission::setAudioFileURL, DataType.PROFILE_PICTURE_URL);
-            submissionRepositoryGenerator.setData(Submission::setSubmissionID, DataType.UUID);
-            submissionRepositoryGenerator.setData(Submission::setMainArtist, DataType.FIRST_NAME);
-            submissionRepositoryGenerator.setData(Submission::setTitle, DataType.WORD);
-            submissionRepository.saveAll(submissionRepositoryGenerator.create(100, seed));
 
-            logger.info("... generating 100 Goop User entities...");
-            ExampleDataGenerator<GoopUser> goopUserRepositoryGenerator = new ExampleDataGenerator<>(GoopUser.class,
-                    LocalDateTime.of(2022, 2, 2, 0, 0, 0));
-            goopUserRepositoryGenerator.setData(GoopUser::setDiscordID, DataType.WORD);
-            goopUserRepositoryGenerator.setData(GoopUser::setArtistName, DataType.FIRST_NAME);
-            goopUserRepositoryGenerator.setData(GoopUser::setPronouns, DataType.WORD);
-            goopUserRepositoryGenerator.setData(GoopUser::setEmail, DataType.EMAIL);
-            goopUserRepositoryGenerator.setData(GoopUser::setPhone, DataType.PHONE_NUMBER);
-            goopUserRepositoryGenerator.setData(GoopUser::setSubmissions, DataType.TWO_WORDS);
-            goopUserRepositoryGenerator.setData(GoopUser::setActiveSubmission, DataType.BOOLEAN_50_50);
-            goopUserRepository.saveAll(goopUserRepositoryGenerator.create(100, seed));
+            GoopUser goopUser = new GoopUser();
+            goopUser.setDiscordID("620845493957951498");
+            goopUser.setArtistName("TheLickIn13Keys");
+            goopUser.setPronouns("he/him");
+            goopUser.setEmail("bardiaanvari10@gmail.com");
+            goopUser.setPhone("9253846745");
+            goopUser.setActiveSubmission(false);
+            goopUserRepository.save(goopUser);
 
-            logger.info("Generated demo data");
+
+//            logger.info("... generating 100 Submission entities...");
+//            ExampleDataGenerator<Submission> submissionRepositoryGenerator = new ExampleDataGenerator<>(
+//                    Submission.class, LocalDateTime.of(2022, 2, 2, 0, 0, 0));
+//            submissionRepositoryGenerator.setData(Submission::setCoverArt, DataType.PROFILE_PICTURE_URL);
+//            submissionRepositoryGenerator.setData(Submission::setAudioFileURL, DataType.PROFILE_PICTURE_URL);
+//            submissionRepositoryGenerator.setData(Submission::setSubmissionID, DataType.UUID);
+//            submissionRepositoryGenerator.setData(Submission::setMainArtist, DataType.FIRST_NAME);
+//            submissionRepositoryGenerator.setData(Submission::setTitle, DataType.WORD);
+//            submissionRepository.saveAll(submissionRepositoryGenerator.create(100, seed));
+//
+//            logger.info("... generating 100 Goop User entities...");
+//            ExampleDataGenerator<GoopUser> goopUserRepositoryGenerator = new ExampleDataGenerator<>(GoopUser.class,
+//                    LocalDateTime.of(2022, 2, 2, 0, 0, 0));
+//            goopUserRepositoryGenerator.setData(GoopUser::setDiscordID, DataType.WORD);
+//            goopUserRepositoryGenerator.setData(GoopUser::setArtistName, DataType.FIRST_NAME);
+//            goopUserRepositoryGenerator.setData(GoopUser::setPronouns, DataType.WORD);
+//            goopUserRepositoryGenerator.setData(GoopUser::setEmail, DataType.EMAIL);
+//            goopUserRepositoryGenerator.setData(GoopUser::setPhone, DataType.PHONE_NUMBER);
+//            goopUserRepositoryGenerator.setData(GoopUser::setSubmissions, DataType.TWO_WORDS);
+//            goopUserRepositoryGenerator.setData(GoopUser::setActiveSubmission, DataType.BOOLEAN_50_50);
+//            goopUserRepository.saveAll(goopUserRepositoryGenerator.create(100, seed));
+//
+//            logger.info("Generated demo data");
         };
     }
 

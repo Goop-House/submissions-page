@@ -184,7 +184,7 @@ public class AllSubmissionsView extends Div implements BeforeEnterObserver {
 
         FormLayout formLayout = new FormLayout();
         Label coverArtLabel = new Label("Cover Art");
-        coverArtPreview = new Image();
+        coverArtPreview = new Image(); 
         coverArtPreview.setWidth("100%");
         coverArt = new Upload();
         coverArt.getStyle().set("box-sizing", "border-box");

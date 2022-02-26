@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import submit.goop.house.data.service.GoopUserService;
 import submit.goop.house.security.AuthenticatedUser;
 import submit.goop.house.views.MainLayout;
 
@@ -22,7 +23,7 @@ import submit.goop.house.views.MainLayout;
 @AnonymousAllowed
 public class ChatView extends VerticalLayout {
 
-    public ChatView() {
+    public ChatView(GoopUserService goopUserService) {
         addClassName("chat-view");
         setSpacing(false);
         // UserInfo is used by Collaboration Engine and is used to share details
@@ -32,6 +33,8 @@ public class ChatView extends VerticalLayout {
         // avatar by passing an url to the image as a third parameter, or by
         // configuring an `ImageProvider` to `avatarGroup`.
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        goopUserService.get(auth.getName());
         UserInfo userInfo = new UserInfo(UUID.randomUUID().toString(), auth.getName(), null);
 
         // Tabs allow us to change chat rooms.

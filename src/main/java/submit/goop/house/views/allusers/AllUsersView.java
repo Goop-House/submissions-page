@@ -32,6 +32,8 @@ import java.util.UUID;
 import javax.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import submit.goop.house.data.entity.GoopUser;
 import submit.goop.house.data.service.GoopUserService;
 import submit.goop.house.views.MainLayout;
@@ -76,7 +78,8 @@ public class AllUsersView extends Div implements BeforeEnterObserver {
         // identifier, and the user's real name. You can also provide the users
         // avatar by passing an url to the image as a third parameter, or by
         // configuring an `ImageProvider` to `avatarGroup`.
-        UserInfo userInfo = new UserInfo(UUID.randomUUID().toString(), "Steve Lange");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        UserInfo userInfo = new UserInfo(UUID.randomUUID().toString(), auth.getName(), null);
 
         // Create UI
         SplitLayout splitLayout = new SplitLayout();
@@ -89,6 +92,7 @@ public class AllUsersView extends Div implements BeforeEnterObserver {
         createEditorLayout(splitLayout);
 
         add(splitLayout);
+
 
         // Configure Grid
         grid.addColumn("discordID").setAutoWidth(true);

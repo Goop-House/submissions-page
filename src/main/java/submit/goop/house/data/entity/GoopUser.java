@@ -1,6 +1,8 @@
 package submit.goop.house.data.entity;
 
+import java.util.List;
 import java.util.UUID;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import submit.goop.house.data.AbstractEntity;
 
@@ -12,7 +14,9 @@ public class GoopUser extends AbstractEntity {
     private String pronouns;
     private String email;
     private String phone;
+
     private String submissions;
+
     private boolean activeSubmission;
 
     public String getDiscordID() {
@@ -45,9 +49,7 @@ public class GoopUser extends AbstractEntity {
     public void setPhone(String phone) {
         this.phone = phone;
     }
-    public String getSubmissions() {
-        return submissions;
-    }
+    public String getSubmissions() { return submissions;}
     public void setSubmissions(String submissions) {
         this.submissions = submissions;
     }
