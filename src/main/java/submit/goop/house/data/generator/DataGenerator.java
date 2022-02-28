@@ -67,7 +67,9 @@ public class DataGenerator {
 
             Submission submission = new Submission();
             submission.setSubmissionID(UUID.fromString("3fc41c69-62c1-409c-a4a5-185baedfebfa"));
-            submission.setMainArtist("TheLickIn13Keys#7977's Submission");
+            submission.setMainArtist("TheLickIn13Keys");
+            submission.setTitle("Joe Biden Mixtape");
+            submission.setEvent("Goop Week 6");
             submissionRepository.save(submission);
 
 

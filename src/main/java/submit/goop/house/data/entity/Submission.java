@@ -15,6 +15,7 @@ public class Submission extends AbstractEntity {
     private UUID submissionID;
     private String mainArtist;
     private String title;
+    private String event;
 
     public String getCoverArt() {
         return coverArt;
@@ -42,4 +43,6 @@ public class Submission extends AbstractEntity {
     }
     public String getTitle() {return title;}
     public void setTitle(String title) {this.title = title;}
+    public void setEvent(String event) {this.event = event;}
+    public String getEvent() {return event;}
 }

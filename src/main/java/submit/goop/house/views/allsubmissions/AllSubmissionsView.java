@@ -102,6 +102,7 @@ public class AllSubmissionsView extends Div implements BeforeEnterObserver {
         grid.addColumn("submissionID").setAutoWidth(true);
         grid.addColumn("mainArtist").setAutoWidth(true);
         grid.addColumn("title").setAutoWidth(true);
+        grid.addColumn("event").setAutoWidth(true);
         grid.setItems(query -> submissionService.list(
                 PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
                 .stream());

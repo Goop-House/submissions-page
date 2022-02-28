@@ -27,13 +27,13 @@ public class MySubmissionsViewCard extends LitTemplate {
     @Id
     private Span badge;
 
-    public MySubmissionsViewCard(String text, String url) {
-        this.image.setSrc(url);
-        this.image.setAlt(text);
-        this.header.setText("Title");
-        this.subtitle.setText("Card subtitle");
+    public MySubmissionsViewCard(String songName, String event, String imageUrl, String artists) {
+        this.image.setSrc(imageUrl);
+        //this.image.setAlt(text);
+        this.header.setText(songName);
+        this.subtitle.setText(event);
         this.text.setText(
-                "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut.");
-        this.badge.setText("Label");
+                "By " + artists);
+        this.badge.setText("Certified Goopy");
     }
 }

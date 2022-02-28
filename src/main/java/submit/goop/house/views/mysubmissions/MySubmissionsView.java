@@ -5,12 +5,29 @@ import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.littemplate.LitTemplate;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.template.Id;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import javax.annotation.security.RolesAllowed;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import submit.goop.house.data.entity.GoopUser;
+import submit.goop.house.data.entity.Submission;
+import submit.goop.house.data.service.GoopUserService;
+import submit.goop.house.data.service.SubmissionService;
+import submit.goop.house.endpoint.SubmissionsEndpoint;
+import submit.goop.house.security.AuthenticatedUser;
 import submit.goop.house.views.MainLayout;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 @PageTitle("My Submissions")
 @Route(value = "my-submissions", layout = MainLayout.class)
@@ -22,22 +39,40 @@ public class MySubmissionsView extends LitTemplate implements HasComponents, Has
     @Id
     private Select<String> sortBy;
 
-    public MySubmissionsView() {
+    public MySubmissionsView(GoopUserService goopUserService, SubmissionService submissionService) {
         addClassNames("my-submissions-view", "flex", "flex-col", "h-full");
         sortBy.setItems("Popularity", "Newest first", "Oldest first");
         sortBy.setValue("Popularity");
 
-        add(new MySubmissionsViewCard("Snow mountains under stars",
-                "https://images.unsplash.com/photo-1519681393784-d120267933ba?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80"));
-        add(new MySubmissionsViewCard("Snow covered mountain",
-                "https://images.unsplash.com/photo-1512273222628-4daea6e55abb?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80"));
-        add(new MySubmissionsViewCard("River between mountains",
-                "https://images.unsplash.com/photo-1536048810607-3dc7f86981cb?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=375&q=80"));
-        add(new MySubmissionsViewCard("Milky way on mountains",
-                "https://images.unsplash.com/photo-1515705576963-95cad62945b6?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=750&q=80"));
-        add(new MySubmissionsViewCard("Mountain with fog",
-                "https://images.unsplash.com/photo-1513147122760-ad1d5bf68cdb?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80"));
-        add(new MySubmissionsViewCard("Mountain at night",
-                "https://images.unsplash.com/photo-1562832135-14a35d25edef?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=815&q=80"));
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        List<GoopUser> possibleGoopUser = goopUserService.findByDiscordID(auth.getName());
+        GoopUser goopUser = possibleGoopUser.get(0);
+        ArrayList<String> submissionIDs = new ArrayList<String>(Arrays.asList(goopUser.getSubmissions().split(",")));
+        ArrayList<Submission> submissions = new ArrayList<Submission>();
+        SubmissionsEndpoint submissionsEndpoint = new SubmissionsEndpoint();
+        for (String submissionID : submissionIDs){
+            try {
+                UUID subID = UUID.fromString(submissionID);
+                submissions.add(submissionService.findBySubmissionID(subID).get(0));
+            } catch (Exception e){
+                e.printStackTrace();
+                Notification.show("An error occurred while loading som of your submissions.", 5, Notification.Position.TOP_CENTER);
+            }
+
+        }
+        for(Submission submission : submissions) {
+            try {
+                String songName = submission.getTitle() == null ? "Unknown" : submission.getTitle();
+                String event = submission.getEvent() == null ? "Unknown" : submission.getEvent();
+                //String imageURL = submission.getCoverArt() ==  null ? submissionsEndpoint.getEventArt(event) : submission.getCoverArt();
+                String imageURL = submissionsEndpoint.getEventArt(event);
+                String artistName = submission.getMainArtist() == null ? "Unknown" : submission.getMainArtist();
+
+                add(new MySubmissionsViewCard(songName, event, imageURL, artistName));
+            } catch (Exception e) {
+                e.printStackTrace();
+                Notification.show("An error occurred while loading som of your submissions.", 5, Notification.Position.TOP_CENTER);
+            }
+        }
     }
 }
