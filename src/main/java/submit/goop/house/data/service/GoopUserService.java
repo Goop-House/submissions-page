@@ -1,5 +1,6 @@
 package submit.goop.house.data.service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,23 @@ public class GoopUserService {
     public Optional<GoopUser> get(UUID id) {
         return repository.findById(id);
     }
+
+    public List<GoopUser> getAll() {
+        return repository.findAll();
+    }
+
+    public List<GoopUser> findByDiscordID(String discordID){
+        return repository.findByDiscordID(discordID);
+    }
+
+    public Page<GoopUser> getAll(Pageable pageable) {
+        return repository.findAll(pageable);
+    }
+
+    public GoopUser create(GoopUser goopUser) {
+        return repository.save(goopUser);
+    }
+
 
     public GoopUser update(GoopUser entity) {
         return repository.save(entity);

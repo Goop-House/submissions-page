@@ -5,6 +5,7 @@ import com.vaadin.exampledata.ExampleDataGenerator;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -60,8 +61,14 @@ public class DataGenerator {
             goopUser.setPronouns("he/him");
             goopUser.setEmail("bardiaanvari10@gmail.com");
             goopUser.setPhone("9253846745");
-            goopUser.setActiveSubmission(false);
+            goopUser.setSubmissions("3fc41c69-62c1-409c-a4a5-185baedfebfa,f8f8f8f8-f8f8-f8f8-f8f8-f8f8f8f8f8f8,f8f8f8f8-f8f8-f8f8-f8f8-f8f8f8f8f8f8");
+            goopUser.setActiveSubmission(true);
             goopUserRepository.save(goopUser);
+
+            Submission submission = new Submission();
+            submission.setSubmissionID(UUID.fromString("3fc41c69-62c1-409c-a4a5-185baedfebfa"));
+            submission.setMainArtist("TheLickIn13Keys#7977's Submission");
+            submissionRepository.save(submission);
 
 
 //            logger.info("... generating 100 Submission entities...");

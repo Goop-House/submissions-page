@@ -29,16 +29,23 @@ import javax.persistence.Lob;
 
 import io.swagger.models.auth.In;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import submit.goop.house.data.entity.GoopUser;
 import submit.goop.house.data.entity.Submission;
+import submit.goop.house.data.entity.User;
 import submit.goop.house.data.service.GoopUserService;
 import submit.goop.house.data.service.SubmissionService;
+import submit.goop.house.data.service.UserService;
 import submit.goop.house.views.MainLayout;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.UUID;
 
 @PageTitle("Manage Active Submission or new Submission")
@@ -52,7 +59,7 @@ public class SubmitView extends Div {
     private TextField coverArt = new TextField("Cover Art");
     private TextField audioFileURL = new TextField("Audio File URL");
     //private TextField submissionID = new TextField("Submission ID");
-    private UUID submissionID = UUID.randomUUID();
+    private UUID submissionID;
 
     private Button cancel = new Button("Cancel");
     private Button save = new Button("Save");
@@ -67,7 +74,11 @@ public class SubmitView extends Div {
     //private H4 audioUploadLabel = new H4("Audio File");
     //private H4 artUploadLabel = new H4("Optional Artwork");
 
-    public SubmitView(SubmissionService submissionService) {
+    private GoopUser authGoopUser;
+    private SubmissionService submissionService;
+
+
+    public SubmitView(SubmissionService submissionService, UserService userService, GoopUserService goopUserService) {
         addClassName("submit-view");
 
         add(createTitle());
@@ -76,15 +87,31 @@ public class SubmitView extends Div {
         add(createButtonLayout());
 
         binder.bindInstanceFields(this);
-        clearForm();
 
 
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        List<GoopUser> possibleGoopUser = goopUserService.findByDiscordID(auth.getName());
+//        this.authGoopUser = possibleGoopUser.get(0);
+//        this.submissionService = submissionService;
+
+        if(possibleGoopUser.get(0).isActiveSubmission()) {
+            UUID subID = UUID.fromString(possibleGoopUser.get(0).getSubmissions().split(",")[0]);
+            this.submissionID = subID;
+            setFormData(submissionService.findBySubmissionID(subID).get(0));
+            Logger logger = LoggerFactory.getLogger(getClass());
+            logger.info("Main Artist: " + submissionService.findBySubmissionID(subID).get(0).getMainArtist());
+        }
+        else {
+            this.submissionID = UUID.randomUUID();
+            Notification.show("You have no active submission, so a new one has been created.");
+            clearForm();
+        }
 
         cancel.addClickListener(e -> clearForm());
         save.addClickListener(e -> {
             submissionService.update(binder.getBean());
-            Notification.show(binder.getBean().getClass().getSimpleName() + " details stored.");
-            clearForm();
+            Notification.show("Your submission has been successfully saved");
+            //clearForm();
         });
 
         audioUpload.addSucceededListener(e -> {
@@ -92,6 +119,7 @@ public class SubmitView extends Div {
             Submission submission = binder.getBean();
             //submission.setAudioFileURL("/uploads/audio/" + fileName);
             submission.setSubmissionID(this.submissionID);
+
             audioFileURL.setValue("/uploads/audio/" + fileName);
             InputStream inputStream = audioMemoryBuffer.getInputStream();
             try {
@@ -132,6 +160,11 @@ public class SubmitView extends Div {
             );
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         });
+    }
+
+    private void setFormData(Submission submission) {
+        Notification.show("You already have an active submission, so it has been loaded into the form.");
+        binder.setBean(submission);
     }
 
     private String saveAudioFileToDisk(InputStream inputStream, String fileName) throws IOException {

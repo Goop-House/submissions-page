@@ -1,5 +1,6 @@
 package submit.goop.house.data.service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import submit.goop.house.data.entity.Submission;
+import submit.goop.house.data.entity.User;
 
 @Service
 public class SubmissionService {
@@ -37,4 +39,5 @@ public class SubmissionService {
         return (int) repository.count();
     }
 
+    public List<Submission> findBySubmissionID(UUID submissionID){ return repository.findBySubmissionID(submissionID);}
 }
