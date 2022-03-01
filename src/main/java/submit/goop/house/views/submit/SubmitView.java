@@ -61,7 +61,7 @@ public class SubmitView extends Div {
     //private TextField submissionID = new TextField("Submission ID");
     private UUID submissionID;
 
-    private Button cancel = new Button("Cancel");
+    //private Button cancel = new Button("Cancel");
     private Button save = new Button("Save");
 
     private Binder<Submission> binder = new Binder(Submission.class);
@@ -107,7 +107,7 @@ public class SubmitView extends Div {
             clearForm();
         }
 
-        cancel.addClickListener(e -> clearForm());
+        //cancel.addClickListener(e -> clearForm());
         save.addClickListener(e -> {
             submissionService.update(binder.getBean());
             Notification.show("Your submission has been successfully saved");
@@ -217,7 +217,7 @@ public class SubmitView extends Div {
         buttonLayout.addClassName("button-layout");
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         buttonLayout.add(save);
-        buttonLayout.add(cancel);
+        //buttonLayout.add(cancel);
         return buttonLayout;
     }
 
