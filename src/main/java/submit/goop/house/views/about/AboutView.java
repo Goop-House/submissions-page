@@ -16,19 +16,31 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import io.swagger.models.resourcelisting.OAuth2Authorization;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.client.authentication.OAuth2LoginAuthenticationToken;
+import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 import submit.goop.house.data.entity.GoopUser;
 import submit.goop.house.data.service.GoopUserService;
 import submit.goop.house.data.service.UserService;
 import submit.goop.house.views.MainLayout;
 
+import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 @PageTitle("About")
 @Route(value = "about", layout = MainLayout.class)
 @RouteAlias(value = "", layout = MainLayout.class)
 @AnonymousAllowed
+//@RestController
+//@Component
 public class AboutView extends VerticalLayout {
 
     public AboutView(GoopUserService goopUserService, UserService userService) {
@@ -78,6 +90,7 @@ public class AboutView extends VerticalLayout {
                 + "return waitForLoadingToFinish();");
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Authentication: " + auth.getName());
         loadingFinished.then(Boolean.class, (res) -> {
             if(!auth.getName().equals("anonymousUser")) {
                 List<GoopUser> possibleGoopUser = goopUserService.findByDiscordID(auth.getName());
@@ -90,6 +103,13 @@ public class AboutView extends VerticalLayout {
             }
         });
     }
+
+//    @GetMapping("/login")
+//    public void welcome(Principal principal) {
+//        Map<String, Object> details = (Map<String, Object>) ((OAuth2LoginAuthenticationToken) principal).getDetails();
+//        String name = (String) details.get("name");
+//        System.out.println(name);
+//    }
 
     private static VerticalLayout createDialogLayout(Dialog dialog) {
         H2 headline = new H2("Create new employee");
