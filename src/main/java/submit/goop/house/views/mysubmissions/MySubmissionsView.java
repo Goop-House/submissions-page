@@ -56,7 +56,7 @@ public class MySubmissionsView extends LitTemplate implements HasComponents, Has
                 submissions.add(submissionService.findBySubmissionID(subID).get(0));
             } catch (Exception e){
                 e.printStackTrace();
-                Notification.show("An error occurred while loading som of your submissions.", 5, Notification.Position.TOP_CENTER);
+                Notification.show("An error occurred while loading some of your submissions.", 2000, Notification.Position.TOP_CENTER);
             }
 
         }
@@ -71,7 +71,7 @@ public class MySubmissionsView extends LitTemplate implements HasComponents, Has
                 add(new MySubmissionsViewCard(songName, event, imageURL, artistName));
             } catch (Exception e) {
                 e.printStackTrace();
-                Notification.show("An error occurred while loading som of your submissions.", 5, Notification.Position.TOP_CENTER);
+                Notification.show("An error occurred while loading some of your submissions.", 2000, Notification.Position.TOP_CENTER);
             }
         }
     }

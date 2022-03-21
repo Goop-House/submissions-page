@@ -14,7 +14,7 @@ public class LoginView extends LoginOverlay {
         LoginI18n i18n = LoginI18n.createDefault();
         i18n.setHeader(new LoginI18n.Header());
         i18n.getHeader().setTitle("Goop House Submissions");
-        i18n.getHeader().setDescription("Login using user/user or admin/admin");
+        i18n.getHeader().setDescription("Made with ❤️ by Bardia (TheLickIn13Keys)");
         i18n.setAdditionalInformation(null);
         setI18n(i18n);
 

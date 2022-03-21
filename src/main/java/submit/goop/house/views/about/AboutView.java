@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import submit.goop.house.data.entity.GoopUser;
 import submit.goop.house.data.service.GoopUserService;
 import submit.goop.house.data.service.UserService;
+import submit.goop.house.security.AuthenticatedUser;
 import submit.goop.house.views.MainLayout;
 
 import java.util.List;
@@ -31,7 +32,7 @@ import java.util.List;
 @AnonymousAllowed
 public class AboutView extends VerticalLayout {
 
-    public AboutView(GoopUserService goopUserService, UserService userService) {
+    public AboutView(GoopUserService goopUserService, UserService userService, AuthenticatedUser authenticatedUser) {
         setSpacing(false);
 
         Image img = new Image("images/empty-plant.png", "placeholder plant");
@@ -47,12 +48,12 @@ public class AboutView extends VerticalLayout {
         getStyle().set("text-align", "center");
 
         Dialog dialog = new Dialog();
-        dialog.getElement().setAttribute("aria-label", "Create new employee");
+        dialog.getElement().setAttribute("aria-label", "Welcome to Goop House Submissions!");
         dialog.setCloseOnEsc(false);
         dialog.setCloseOnOutsideClick(false);
         dialog.setModal(true);
 
-        VerticalLayout dialogLayout = createDialogLayout(dialog);
+        VerticalLayout dialogLayout = createDialogLayout(dialog, goopUserService);
         dialog.add(dialogLayout);
 
         Button button = new Button("Show dialog", e -> dialog.open());
@@ -91,29 +92,35 @@ public class AboutView extends VerticalLayout {
         });
     }
 
-    private static VerticalLayout createDialogLayout(Dialog dialog) {
-        H2 headline = new H2("Create new employee");
-        headline.getStyle().set("margin", "var(--lumo-space-m) 0 0 0")
-                .set("font-size", "1.5em").set("font-weight", "bold");
+    private static VerticalLayout createDialogLayout(Dialog dialog, GoopUserService goopUserService) {
+        H2 headline = new H2("Welcome to Goop House Submissions!");
+        headline.getStyle().set("margin", "var(--lumo-space-m) 0 0 0").set("font-size", "1.5em").set("font-weight", "bold");
 
-        TextField firstNameField = new TextField("First name");
-        TextField lastNameField = new TextField("Last name");
-        VerticalLayout fieldLayout = new VerticalLayout(firstNameField,
-                lastNameField);
+        TextField discordID = new TextField("Discord ID");
+        TextField artistName = new TextField("Artist Name");
+        TextField pronouns = new TextField("Pronouns (Ex: they/them)");
+        VerticalLayout fieldLayout = new VerticalLayout(discordID, artistName, pronouns);
         fieldLayout.setSpacing(false);
         fieldLayout.setPadding(false);
         fieldLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
 
-        Button cancelButton = new Button("Cancel", e -> dialog.close());
-        Button saveButton = new Button("Save", e -> dialog.close());
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        HorizontalLayout buttonLayout = new HorizontalLayout(cancelButton,
-                saveButton);
-        buttonLayout
-                .setJustifyContentMode(FlexComponent.JustifyContentMode.END);
+        discordID.setReadOnly(true);
+        discordID.setValue(SecurityContextHolder.getContext().getAuthentication().getName());
 
-        VerticalLayout dialogLayout = new VerticalLayout(headline, fieldLayout,
-                buttonLayout);
+        //Button cancelButton = new Button("Cancel", e -> dialog.close());
+        Button saveButton = new Button("Save", e -> {
+            GoopUser goopUser = new GoopUser();
+            goopUser.setDiscordID(discordID.getValue());
+            goopUser.setArtistName(artistName.getValue());
+            goopUser.setPronouns(pronouns.getValue());
+            goopUserService.create(goopUser);
+            dialog.close();
+        });
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        HorizontalLayout buttonLayout = new HorizontalLayout(saveButton);
+        buttonLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
+
+        VerticalLayout dialogLayout = new VerticalLayout(headline, fieldLayout, buttonLayout);
         dialogLayout.setPadding(false);
         dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
         dialogLayout.getStyle().set("width", "300px").set("max-width", "100%");

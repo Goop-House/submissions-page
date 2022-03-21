@@ -37,15 +37,17 @@ public class DataGenerator {
 
             logger.info("Generating demo data");
 
-            logger.info("... generating 2 User entities...");
+            logger.info("... generating 3 User entities...");
             User user = new User();
-            user.setName("John Normal");
-            user.setUsername("user");
+            user.setName("TheLickIn13Alts#8075");
+            user.setUsername("856445161059385364");
             user.setHashedPassword(passwordEncoder.encode("user"));
             user.setProfilePictureUrl(
-                    "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=128&h=128&q=80");
+                    "https://github.com/TheLickIn13Keys/profile-pictures/blob/main/kirbypfp.png?raw=true");
             user.setRoles(Collections.singleton(Role.USER));
             userRepository.save(user);
+
+
             User admin = new User();
             admin.setName("TheLickIn13Keys#7977");
             admin.setUsername("620845493957951498");

@@ -19,9 +19,17 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import javax.annotation.security.RolesAllowed;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import submit.goop.house.data.entity.GoopUser;
 import submit.goop.house.data.entity.SamplePerson;
+import submit.goop.house.data.service.GoopUserService;
 import submit.goop.house.data.service.SamplePersonService;
+import submit.goop.house.security.AuthenticatedUser;
 import submit.goop.house.views.MainLayout;
+
+import java.util.List;
 
 @PageTitle("My Info")
 @Route(value = "my-info", layout = MainLayout.class)
@@ -29,19 +37,21 @@ import submit.goop.house.views.MainLayout;
 @Uses(Icon.class)
 public class MyInfoView extends Div {
 
-    private TextField firstName = new TextField("First name");
-    private TextField lastName = new TextField("Last name");
+    private TextField discordID = new TextField("Discord ID");
+    private TextField artistName = new TextField("Artist Name");
+    private TextField pronouns = new TextField("Pronouns");
     private EmailField email = new EmailField("Email address");
-    private DatePicker dateOfBirth = new DatePicker("Birthday");
     private PhoneNumberField phone = new PhoneNumberField("Phone number");
-    private TextField occupation = new TextField("Occupation");
+    private TextField submissions = new TextField("Submission IDs");
 
-    private Button cancel = new Button("Cancel");
+    //private Button cancel = new Button("Cancel");
     private Button save = new Button("Save");
 
-    private Binder<SamplePerson> binder = new Binder(SamplePerson.class);
+    private Binder<GoopUser> binder = new Binder(GoopUser.class);
 
-    public MyInfoView(SamplePersonService personService) {
+    private GoopUser goopUser;
+
+    public MyInfoView(GoopUserService goopUserService) {
         addClassName("my-info-view");
 
         add(createTitle());
@@ -49,28 +59,42 @@ public class MyInfoView extends Div {
         add(createButtonLayout());
 
         binder.bindInstanceFields(this);
-        clearForm();
 
-        cancel.addClickListener(e -> clearForm());
-        save.addClickListener(e -> {
-            personService.update(binder.getBean());
-            Notification.show(binder.getBean().getClass().getSimpleName() + " details stored.");
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        List<GoopUser> possibleGoopUser = goopUserService.findByDiscordID(auth.getName());
+        if (possibleGoopUser.size() >= 1) {
+            binder.setBean(possibleGoopUser.get(0));
+        }
+        else {
             clearForm();
+            Notification.show("No user found, please contact a mod");
+        }
+
+
+
+        //cancel.addClickListener(e -> clearForm());
+        save.addClickListener(e -> {
+            goopUserService.update(binder.getBean());
+            Notification.show("Artist details saved.");
+            //clearForm();
         });
     }
 
     private void clearForm() {
-        binder.setBean(new SamplePerson());
+        binder.setBean(new GoopUser());
     }
 
     private Component createTitle() {
-        return new H3("Personal information");
+        return new H3("Artist information");
     }
 
     private Component createFormLayout() {
         FormLayout formLayout = new FormLayout();
         email.setErrorMessage("Please enter a valid email address");
-        formLayout.add(firstName, lastName, dateOfBirth, phone, email, occupation);
+        discordID.setReadOnly(true);
+        submissions.setReadOnly(true);
+        formLayout.add(discordID, submissions, artistName, pronouns, phone, email);
         return formLayout;
     }
 
@@ -79,7 +103,7 @@ public class MyInfoView extends Div {
         buttonLayout.addClassName("button-layout");
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         buttonLayout.add(save);
-        buttonLayout.add(cancel);
+        //buttonLayout.add(cancel);
         return buttonLayout;
     }
 
@@ -93,7 +117,7 @@ public class MyInfoView extends Div {
             countryCode.setPlaceholder("Country");
             countryCode.setPattern("\\+\\d*");
             countryCode.setPreventInvalidInput(true);
-            countryCode.setItems("+354", "+91", "+62", "+98", "+964", "+353", "+44", "+972", "+39", "+225");
+            countryCode.setItems("+1","+44", "+52", "+91", "+86", "+964", "+353", "+44", "+972", "+39", "+225");
             countryCode.addCustomValueSetListener(e -> countryCode.setValue(e.getDetail()));
             number.setPattern("\\d*");
             number.setPreventInvalidInput(true);
