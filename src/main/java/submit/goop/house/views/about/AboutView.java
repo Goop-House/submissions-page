@@ -7,6 +7,7 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -99,6 +100,9 @@ public class AboutView extends VerticalLayout {
         TextField discordID = new TextField("Discord ID");
         TextField artistName = new TextField("Artist Name");
         TextField pronouns = new TextField("Pronouns (Ex: they/them)");
+        discordID.setRequired(true);
+        artistName.setRequired(true);
+        pronouns.setRequired(true);
         VerticalLayout fieldLayout = new VerticalLayout(discordID, artistName, pronouns);
         fieldLayout.setSpacing(false);
         fieldLayout.setPadding(false);
@@ -109,12 +113,17 @@ public class AboutView extends VerticalLayout {
 
         //Button cancelButton = new Button("Cancel", e -> dialog.close());
         Button saveButton = new Button("Save", e -> {
-            GoopUser goopUser = new GoopUser();
-            goopUser.setDiscordID(discordID.getValue());
-            goopUser.setArtistName(artistName.getValue());
-            goopUser.setPronouns(pronouns.getValue());
-            goopUserService.create(goopUser);
-            dialog.close();
+            if(artistName.isEmpty() || pronouns.isEmpty()) {
+                Notification.show("Please fill out all fields", 3000, Notification.Position.MIDDLE);
+            }
+            else {
+                GoopUser goopUser = new GoopUser();
+                goopUser.setDiscordID(discordID.getValue());
+                goopUser.setArtistName(artistName.getValue());
+                goopUser.setPronouns(pronouns.getValue());
+                goopUserService.create(goopUser);
+                dialog.close();
+            }
         });
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         HorizontalLayout buttonLayout = new HorizontalLayout(saveButton);

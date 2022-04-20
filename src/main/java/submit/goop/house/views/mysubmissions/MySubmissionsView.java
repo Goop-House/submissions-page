@@ -47,32 +47,39 @@ public class MySubmissionsView extends LitTemplate implements HasComponents, Has
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         List<GoopUser> possibleGoopUser = goopUserService.findByDiscordID(auth.getName());
         GoopUser goopUser = possibleGoopUser.get(0);
-        ArrayList<String> submissionIDs = new ArrayList<String>(Arrays.asList(goopUser.getSubmissions().split(",")));
-        ArrayList<Submission> submissions = new ArrayList<Submission>();
-        SubmissionsEndpoint submissionsEndpoint = new SubmissionsEndpoint();
-        for (String submissionID : submissionIDs){
-            try {
-                UUID subID = UUID.fromString(submissionID);
-                submissions.add(submissionService.findBySubmissionID(subID).get(0));
-            } catch (Exception e){
-                e.printStackTrace();
-                Notification.show("An error occurred while loading some of your submissions.", 2000, Notification.Position.TOP_CENTER);
-            }
-
+        if(goopUser.getSubmissions() == null) {
+            //add(new MySubmissionsViewCard("Looks like you don't have any submissions yet!", "N/A", "https://twirpz.files.wordpress.com/2015/06/twitter-avi-gender-balanced-figure.png", "N/A"));
+            assert true;
         }
-        for(Submission submission : submissions) {
-            try {
-                String songName = submission.getTitle() == null ? "Unknown" : submission.getTitle();
-                String event = submission.getEvent() == null ? "Unknown" : submission.getEvent();
-                //String imageURL = submission.getCoverArt() ==  null ? submissionsEndpoint.getEventArt(event) : submission.getCoverArt();
-                String imageURL = submissionsEndpoint.getEventArt(event);
-                String artistName = submission.getMainArtist() == null ? "Unknown" : submission.getMainArtist();
+        else {
+            ArrayList<String> submissionIDs = new ArrayList<String>(Arrays.asList(goopUser.getSubmissions().split(",")));
+            ArrayList<Submission> submissions = new ArrayList<Submission>();
+            SubmissionsEndpoint submissionsEndpoint = new SubmissionsEndpoint();
+            for (String submissionID : submissionIDs){
+                try {
+                    UUID subID = UUID.fromString(submissionID);
+                    submissions.add(submissionService.findBySubmissionID(subID).get(0));
+                } catch (Exception e){
+                    e.printStackTrace();
+                    Notification.show("An error occurred while loading some of your submissions.", 2000, Notification.Position.TOP_CENTER);
+                }
 
-                add(new MySubmissionsViewCard(songName, event, imageURL, artistName));
-            } catch (Exception e) {
-                e.printStackTrace();
-                Notification.show("An error occurred while loading some of your submissions.", 2000, Notification.Position.TOP_CENTER);
+            }
+            for(Submission submission : submissions) {
+                try {
+                    String songName = submission.getTitle() == null ? "Unknown" : submission.getTitle();
+                    String event = submission.getEvent() == null ? "Unknown" : submission.getEvent();
+                    //String imageURL = submission.getCoverArt() ==  null ? submissionsEndpoint.getEventArt(event) : submission.getCoverArt();
+                    String imageURL = submissionsEndpoint.getEventArt(event);
+                    String artistName = submission.getMainArtist() == null ? "Unknown" : submission.getMainArtist();
+
+                    add(new MySubmissionsViewCard(songName, event, imageURL, artistName));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Notification.show("An error occurred while loading some of your submissions.", 2000, Notification.Position.TOP_CENTER);
+                }
             }
         }
+
     }
 }
