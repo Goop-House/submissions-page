@@ -1,8 +1,5 @@
 package submit.goop.house.views.allusers;
 
-import com.vaadin.collaborationengine.CollaborationAvatarGroup;
-import com.vaadin.collaborationengine.CollaborationBinder;
-import com.vaadin.collaborationengine.UserInfo;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.UI;
@@ -19,6 +16,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.converter.StringToUuidConverter;
 import com.vaadin.flow.data.renderer.LitRenderer;
@@ -49,7 +47,7 @@ public class AllUsersView extends Div implements BeforeEnterObserver {
 
     private Grid<GoopUser> grid = new Grid<>(GoopUser.class, false);
 
-    CollaborationAvatarGroup avatarGroup;
+    //CollaborationAvatarGroup avatarGroup;
 
     private TextField discordID;
     private TextField artistName;
@@ -62,7 +60,7 @@ public class AllUsersView extends Div implements BeforeEnterObserver {
     private Button cancel = new Button("Cancel");
     private Button save = new Button("Save");
 
-    private CollaborationBinder<GoopUser> binder;
+    private BeanValidationBinder<GoopUser> binder;
 
     private GoopUser goopUser;
 
@@ -78,15 +76,9 @@ public class AllUsersView extends Div implements BeforeEnterObserver {
         // identifier, and the user's real name. You can also provide the users
         // avatar by passing an url to the image as a third parameter, or by
         // configuring an `ImageProvider` to `avatarGroup`.
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        UserInfo userInfo = new UserInfo(UUID.randomUUID().toString(), auth.getName(), null);
-
         // Create UI
         SplitLayout splitLayout = new SplitLayout();
         splitLayout.setSizeFull();
-
-        avatarGroup = new CollaborationAvatarGroup(userInfo, null);
-        avatarGroup.getStyle().set("visibility", "hidden");
 
         createGridLayout(splitLayout);
         createEditorLayout(splitLayout);
@@ -102,7 +94,7 @@ public class AllUsersView extends Div implements BeforeEnterObserver {
         grid.addColumn("phone").setAutoWidth(true);
         grid.addColumn("submissions").setAutoWidth(true);
         LitRenderer<GoopUser> activeSubmissionRenderer = LitRenderer.<GoopUser>of(
-                "<vaadin-icon icon='vaadin:${item.icon}' style='width: var(--lumo-icon-size-s); height: var(--lumo-icon-size-s); color: ${item.color};'></vaadin-icon>")
+                        "<vaadin-icon icon='vaadin:${item.icon}' style='width: var(--lumo-icon-size-s); height: var(--lumo-icon-size-s); color: ${item.color};'></vaadin-icon>")
                 .withProperty("icon", activeSubmission -> activeSubmission.isActiveSubmission() ? "check" : "minus")
                 .withProperty("color",
                         activeSubmission -> activeSubmission.isActiveSubmission()
@@ -112,7 +104,7 @@ public class AllUsersView extends Div implements BeforeEnterObserver {
         grid.addColumn(activeSubmissionRenderer).setHeader("Active Submission").setAutoWidth(true);
 
         grid.setItems(query -> goopUserService.list(
-                PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
+                        PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
                 .stream());
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.setHeightFull();
@@ -128,7 +120,7 @@ public class AllUsersView extends Div implements BeforeEnterObserver {
         });
 
         // Configure Form
-        binder = new CollaborationBinder<>(GoopUser.class, userInfo);
+        binder = new BeanValidationBinder<>(GoopUser.class);
 
         // Bind fields. This is where you'd define e.g. validation rules
 //        binder.forField(discordID, String.class).withConverter(new StringToUuidConverter("Invalid UUID"))
@@ -202,7 +194,7 @@ public class AllUsersView extends Div implements BeforeEnterObserver {
             ((HasStyle) field).addClassName("full-width");
         }
         formLayout.add(fields);
-        editorDiv.add(avatarGroup, formLayout);
+        editorDiv.add(formLayout);
         createButtonLayout(editorLayoutDiv);
 
         splitLayout.addToSecondary(editorLayoutDiv);
@@ -237,15 +229,7 @@ public class AllUsersView extends Div implements BeforeEnterObserver {
 
     private void populateForm(GoopUser value) {
         this.goopUser = value;
-        String topic = null;
-        if (this.goopUser != null && this.goopUser.getId() != null) {
-            topic = "goopUser/" + this.goopUser.getId();
-            avatarGroup.getStyle().set("visibility", "visible");
-        } else {
-            avatarGroup.getStyle().set("visibility", "hidden");
-        }
-        binder.setTopic(topic, () -> this.goopUser);
-        avatarGroup.setTopic(topic);
+
 
     }
 }

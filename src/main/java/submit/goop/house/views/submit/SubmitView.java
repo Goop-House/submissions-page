@@ -56,7 +56,7 @@ public class SubmitView extends Div {
 
     private TextField mainArtist = new TextField("Artist Name");
     private TextField title = new TextField("Title");
-    private TextField coverArt = new TextField("Cover Art");
+    private TextField coverArt = new TextField("Cover Art (Optional)");
     private TextField audioFileURL = new TextField("Audio File URL");
     //private TextField submissionID = new TextField("Submission ID");
     private UUID submissionID;
@@ -169,12 +169,12 @@ public class SubmitView extends Div {
     }
 
     private String saveAudioFileToDisk(InputStream inputStream, String fileName) throws IOException {
-        File file = new File("/Users/bardia/IdeaProjects/goop-house-submissions/uploads/audio/", fileName);
+        File file = new File("/home/bardia/IdeaProjects/submissions-page/uploads/audio/", fileName);
         FileUtils.copyInputStreamToFile(inputStream, file);
         return file.getAbsolutePath();
     }
     private String saveArtFileToDisk(InputStream inputStream, String fileName) throws IOException {
-        File file = new File("/Users/bardia/IdeaProjects/goop-house-submissions/uploads/art/", fileName);
+        File file = new File("/home/bardia/IdeaProjects/submissions-page/uploads/art/", fileName);
         FileUtils.copyInputStreamToFile(inputStream, file);
         return file.getAbsolutePath();
     }

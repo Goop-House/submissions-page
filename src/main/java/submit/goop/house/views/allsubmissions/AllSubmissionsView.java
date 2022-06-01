@@ -1,11 +1,9 @@
 package submit.goop.house.views.allsubmissions;
 
-import com.vaadin.collaborationengine.CollaborationAvatarGroup;
-import com.vaadin.collaborationengine.CollaborationBinder;
-import com.vaadin.collaborationengine.UserInfo;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.avatar.AvatarGroup;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -19,6 +17,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.converter.StringToUuidConverter;
 import com.vaadin.flow.data.renderer.LitRenderer;
@@ -36,9 +35,14 @@ import java.util.UUID;
 import javax.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.util.UriUtils;
 import submit.goop.house.data.entity.Submission;
+import submit.goop.house.data.entity.User;
 import submit.goop.house.data.service.SubmissionService;
+import submit.goop.house.data.service.UserService;
+import submit.goop.house.security.AuthenticatedUser;
 import submit.goop.house.views.MainLayout;
 
 @PageTitle("All Submissions")
@@ -51,7 +55,7 @@ public class AllSubmissionsView extends Div implements BeforeEnterObserver {
 
     private Grid<Submission> grid = new Grid<>(Submission.class, false);
 
-    CollaborationAvatarGroup avatarGroup;
+    //AvatarGroup avatarGroup;
 
     private Upload coverArt;
     private Image coverArtPreview;
@@ -63,13 +67,13 @@ public class AllSubmissionsView extends Div implements BeforeEnterObserver {
     private Button cancel = new Button("Cancel");
     private Button save = new Button("Save");
 
-    private CollaborationBinder<Submission> binder;
+    private BeanValidationBinder<Submission> binder;
 
     private Submission submission;
 
     private SubmissionService submissionService;
 
-    public AllSubmissionsView(@Autowired SubmissionService submissionService) {
+    public AllSubmissionsView(@Autowired SubmissionService submissionService, UserService userService) {
         this.submissionService = submissionService;
         addClassNames("all-submissions-view", "flex", "flex-col", "h-full");
 
@@ -79,14 +83,15 @@ public class AllSubmissionsView extends Div implements BeforeEnterObserver {
         // identifier, and the user's real name. You can also provide the users
         // avatar by passing an url to the image as a third parameter, or by
         // configuring an `ImageProvider` to `avatarGroup`.
-        UserInfo userInfo = new UserInfo(UUID.randomUUID().toString(), "Steve Lange");
+        //UserInfo userInfo = new UserInfo(UUID.randomUUID().toString(), "Steve Lange");
 
         // Create UI
         SplitLayout splitLayout = new SplitLayout();
         splitLayout.setSizeFull();
-
-        avatarGroup = new CollaborationAvatarGroup(userInfo, null);
-        avatarGroup.getStyle().set("visibility", "hidden");
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        User authUser = userService.findByUsername(auth.getName());
+//        avatarGroup = new AvatarGroup();
+//        avatarGroup.getStyle().set("visibility", "hidden");
 
 
         createGridLayout(splitLayout);
@@ -104,7 +109,7 @@ public class AllSubmissionsView extends Div implements BeforeEnterObserver {
         grid.addColumn("title").setAutoWidth(true);
         grid.addColumn("event").setAutoWidth(true);
         grid.setItems(query -> submissionService.list(
-                PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
+                        PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
                 .stream());
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.setHeightFull();
@@ -120,10 +125,10 @@ public class AllSubmissionsView extends Div implements BeforeEnterObserver {
         });
 
         // Configure Form
-        binder = new CollaborationBinder<>(Submission.class, userInfo);
+        binder = new BeanValidationBinder<>(Submission.class);
 
         // Bind fields. This is where you'd define e.g. validation rules
-        binder.forField(submissionID, String.class).withConverter(new StringToUuidConverter("Invalid UUID"))
+        binder.forField(submissionID).withConverter(new StringToUuidConverter("Invalid UUID"))
                 .bind("submissionID");
 
         binder.bindInstanceFields(this);
@@ -185,7 +190,7 @@ public class AllSubmissionsView extends Div implements BeforeEnterObserver {
 
         FormLayout formLayout = new FormLayout();
         Label coverArtLabel = new Label("Cover Art");
-        coverArtPreview = new Image(); 
+        coverArtPreview = new Image();
         coverArtPreview.setWidth("100%");
         coverArt = new Upload();
         coverArt.getStyle().set("box-sizing", "border-box");
@@ -205,7 +210,7 @@ public class AllSubmissionsView extends Div implements BeforeEnterObserver {
             ((HasStyle) field).addClassName("full-width");
         }
         formLayout.add(fields);
-        editorDiv.add(avatarGroup, formLayout);
+        editorDiv.add(formLayout);
         createButtonLayout(editorLayoutDiv);
 
         splitLayout.addToSecondary(editorLayoutDiv);
@@ -258,15 +263,6 @@ public class AllSubmissionsView extends Div implements BeforeEnterObserver {
 
     private void populateForm(Submission value) {
         this.submission = value;
-        String topic = null;
-        if (this.submission != null && this.submission.getId() != null) {
-            topic = "submission/" + this.submission.getId();
-            avatarGroup.getStyle().set("visibility", "visible");
-        } else {
-            avatarGroup.getStyle().set("visibility", "hidden");
-        }
-        binder.setTopic(topic, () -> this.submission);
-        avatarGroup.setTopic(topic);
         this.coverArtPreview.setVisible(value != null);
         if (value == null) {
             this.coverArtPreview.setSrc("");
