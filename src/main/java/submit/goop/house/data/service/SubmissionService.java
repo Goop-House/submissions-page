@@ -10,7 +10,11 @@ import org.springframework.stereotype.Service;
 import submit.goop.house.data.entity.Submission;
 import submit.goop.house.data.entity.User;
 
+import javax.transaction.Transactional;
+
 @Service
+@Transactional
+
 public class SubmissionService {
 
     private SubmissionRepository repository;

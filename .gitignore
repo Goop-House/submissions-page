@@ -20,3 +20,5 @@ error-screenshots/
 webpack.generated.js
 
 uploads/
+
+src/main/resources/application.properties

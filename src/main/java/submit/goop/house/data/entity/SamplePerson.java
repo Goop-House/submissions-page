@@ -2,9 +2,13 @@ package submit.goop.house.data.entity;
 
 import java.time.LocalDate;
 import javax.persistence.Entity;
+import javax.persistence.Table;
+
 import submit.goop.house.data.AbstractEntity;
 
 @Entity
+@Table(name = "sample", schema = "public")
+
 public class SamplePerson extends AbstractEntity {
 
     private String firstName;

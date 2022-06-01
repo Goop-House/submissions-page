@@ -20,12 +20,14 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import javax.annotation.security.RolesAllowed;
 
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import submit.goop.house.data.entity.GoopUser;
 import submit.goop.house.data.entity.SamplePerson;
 import submit.goop.house.data.service.GoopUserService;
 import submit.goop.house.data.service.SamplePersonService;
+import submit.goop.house.data.service.UserService;
 import submit.goop.house.security.AuthenticatedUser;
 import submit.goop.house.views.MainLayout;
 
@@ -62,6 +64,7 @@ public class MyInfoView extends Div {
 
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
         List<GoopUser> possibleGoopUser = goopUserService.findByDiscordID(auth.getName());
         if (possibleGoopUser.size() >= 1) {
             binder.setBean(possibleGoopUser.get(0));

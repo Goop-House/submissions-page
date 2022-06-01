@@ -9,7 +9,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import submit.goop.house.data.entity.GoopUser;
 
+import javax.transaction.Transactional;
+
 @Service
+@Transactional
+
 public class GoopUserService {
 
     private GoopUserRepository repository;

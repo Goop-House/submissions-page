@@ -10,7 +10,10 @@ import org.springframework.stereotype.Service;
 import submit.goop.house.data.entity.GoopUser;
 import submit.goop.house.data.entity.User;
 
+import javax.transaction.Transactional;
+
 @Service
+@Transactional
 public class UserService {
 
     private UserRepository repository;
@@ -18,6 +21,7 @@ public class UserService {
     public UserService(@Autowired UserRepository repository) {
         this.repository = repository;
     }
+
 
     public Optional<User> get(UUID id) {
         return repository.findById(id);

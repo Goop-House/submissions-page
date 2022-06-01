@@ -8,7 +8,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import submit.goop.house.data.entity.SamplePerson;
 
+import javax.transaction.Transactional;
+
 @Service
+@Transactional
+
 public class SamplePersonService {
 
     private SamplePersonRepository repository;

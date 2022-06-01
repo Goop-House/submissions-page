@@ -2,14 +2,13 @@ package submit.goop.house.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Set;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Lob;
+import javax.persistence.*;
+
 import submit.goop.house.data.AbstractEntity;
 import submit.goop.house.data.Role;
 
 @Entity
+@Table(name = "user", schema = "public")
 public class User extends AbstractEntity {
 
     private String username;

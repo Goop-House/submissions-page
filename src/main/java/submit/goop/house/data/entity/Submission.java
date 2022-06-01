@@ -3,9 +3,13 @@ package submit.goop.house.data.entity;
 import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
+import javax.persistence.Table;
+
 import submit.goop.house.data.AbstractEntity;
 
 @Entity
+@Table(name = "submission", schema = "public")
+
 public class Submission extends AbstractEntity {
 
     @Lob

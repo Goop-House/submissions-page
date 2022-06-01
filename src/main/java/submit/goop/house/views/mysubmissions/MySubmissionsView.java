@@ -11,6 +11,8 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.template.Id;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 
 import org.springframework.security.core.Authentication;

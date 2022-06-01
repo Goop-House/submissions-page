@@ -63,7 +63,7 @@ public class DataGenerator {
             goopUser.setPronouns("he/him");
             goopUser.setEmail("bardiaanvari10@gmail.com");
             goopUser.setPhone("9253846745");
-            goopUser.setSubmissions("3fc41c69-62c1-409c-a4a5-185baedfebfa,f8f8f8f8-f8f8-f8f8-f8f8-f8f8f8f8f8f8,f8f8f8f8-f8f8-f8f8-f8f8-f8f8f8f8f8f8");
+            goopUser.setSubmissions("3fc41c69-62c1-409c-a4a5-185baedfebfa");
             goopUser.setActiveSubmission(true);
             goopUserRepository.save(goopUser);
 

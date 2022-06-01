@@ -18,7 +18,11 @@ import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import java.util.Optional;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import submit.goop.house.data.entity.User;
+import submit.goop.house.data.service.UserService;
 import submit.goop.house.security.AuthenticatedUser;
 import submit.goop.house.views.about.AboutView;
 import submit.goop.house.views.allsubmissions.AllSubmissionsView;
@@ -81,9 +85,12 @@ public class MainLayout extends AppLayout {
     private AuthenticatedUser authenticatedUser;
     private AccessAnnotationChecker accessChecker;
 
-    public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker) {
+    private UserService userService;
+
+    public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker, UserService userService) {
         this.authenticatedUser = authenticatedUser;
         this.accessChecker = accessChecker;
+        this.userService = userService;
 
         addToNavbar(createHeaderContent());
 
@@ -114,8 +121,12 @@ public class MainLayout extends AppLayout {
                 authenticatedUser.logout();
             });
 
-            Span name = new Span(user.getName());
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            User pos = userService.findByUsername(auth.getName());
+            Span name = new Span(pos.getName());
             name.addClassNames("font-medium", "text-s", "text-secondary");
+
+            Span role = new Span(pos.getRoles().toString());
 
             layout.add(avatar, name);
         } else {
@@ -146,7 +157,7 @@ public class MainLayout extends AppLayout {
         return new MenuItemInfo[]{ //
                 new MenuItemInfo("About", "la la-broadcast-tower", AboutView.class), //
 
-                new MenuItemInfo("Chat", "la la-comments", ChatView.class), //
+//                new MenuItemInfo("Chat", "la la-comments", ChatView.class), //
 
                 new MenuItemInfo("All Submissions", "la la-mail-bulk", AllSubmissionsView.class), //
 
