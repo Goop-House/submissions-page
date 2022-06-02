@@ -12,17 +12,16 @@ import submit.goop.house.data.service.UserRepository;
 import submit.goop.house.data.service.UserService;
 
 import java.util.Collections;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/endpoint")
-public class OutwardEndpointController {
+public class OutwardUserCreationEndpointController {
 
     private UserService userService;
     private PasswordEncoder passwordEncoder;
     private UserRepository userRepository;
 
-    public OutwardEndpointController(PasswordEncoder passwordEncoder, UserRepository userRepository, UserService userService) {
+    public OutwardUserCreationEndpointController(PasswordEncoder passwordEncoder, UserRepository userRepository, UserService userService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
