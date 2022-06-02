@@ -171,12 +171,12 @@ public class SubmitView extends Div {
     }
 
     private String saveAudioFileToDisk(InputStream inputStream, String fileName) throws IOException {
-        File file = new File("/home/bardia/IdeaProjects/submissions-page/uploads/audio/", fileName);
+        File file = new File("uploads/audio/", fileName);
         FileUtils.copyInputStreamToFile(inputStream, file);
         return file.getAbsolutePath();
     }
     private String saveArtFileToDisk(InputStream inputStream, String fileName) throws IOException {
-        File file = new File("/home/bardia/IdeaProjects/submissions-page/uploads/art/", fileName);
+        File file = new File("uploads/art/", fileName);
         FileUtils.copyInputStreamToFile(inputStream, file);
         return file.getAbsolutePath();
     }
