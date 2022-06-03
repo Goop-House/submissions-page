@@ -47,8 +47,12 @@ import submit.goop.house.views.MainLayout;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @PageTitle("Manage Active Submission or new Submission")
 @Route(value = "submit", layout = MainLayout.class)
@@ -76,8 +80,11 @@ public class SubmitView extends Div {
     //private H4 audioUploadLabel = new H4("Audio File");
     //private H4 artUploadLabel = new H4("Optional Artwork");
 
+    private String audioFileName;
+    private String artFileName;
     private GoopUser authGoopUser;
     private SubmissionService submissionService;
+    private User authUser;
 
 
     public SubmitView(SubmissionService submissionService, UserService userService, GoopUserService goopUserService) {
@@ -93,7 +100,8 @@ public class SubmitView extends Div {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         List<GoopUser> possibleGoopUser = goopUserService.findByDiscordID(auth.getName());
-//        this.authGoopUser = possibleGoopUser.get(0);
+        this.authUser = userService.findByUsername(auth.getName());
+        this.authGoopUser = possibleGoopUser.get(0);
 //        this.submissionService = submissionService;
 
         if(possibleGoopUser.get(0).isActiveSubmission()) {
@@ -111,6 +119,118 @@ public class SubmitView extends Div {
 
         //cancel.addClickListener(e -> clearForm());
         save.addClickListener(e -> {
+            boolean changedAudio = false;
+            try {
+                if(new File(audioFileName).exists()) {
+                    File savedAudioFile = new File(audioFileName);
+                    try {
+                        Files.move(Paths.get("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername() + "/" + savedAudioFile.getName()), Paths.get("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + savedAudioFile.getName().split("\\.")[savedAudioFile.getName().split("\\.").length - 1]));
+                        audioFileURL.setValue("/uploads/audio/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + savedAudioFile.getName().split("\\.")[savedAudioFile.getName().split("\\.").length - 1]);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    changedAudio = true;
+                }
+            }
+            catch (Exception ex) {
+                System.out.println("No new audio file");
+            }
+
+
+            boolean changedArt = false;
+            try {
+                if (new File(artFileName).exists()) {
+                    File savedArtFile = new File(artFileName);
+                    try {
+                        Files.move(Paths.get("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername() + "/" + savedArtFile.getName()), Paths.get("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + savedArtFile.getName().split("\\.")[savedArtFile.getName().split("\\.").length - 1]));
+                        coverArt.setValue("/uploads/art/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + savedArtFile.getName().split("\\.")[savedArtFile.getName().split("\\.").length - 1]);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    changedArt = true;
+                }
+            }
+            catch (Exception ex) {
+                System.out.println("No new art file");
+            }
+
+            if(!(changedAudio && changedArt)) {
+                if(changedAudio) {
+                    if(Files.exists(Paths.get("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername()))) {
+                        try (Stream<Path> filePathStream = Files.walk(Paths.get("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername()))){
+                            filePathStream
+                                    .filter(Files::isRegularFile)
+                                    .forEach(path -> {
+                                        try {
+                                            Files.move(path, Paths.get("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + path.getFileName().toString().split("\\.")[path.getFileName().toString().split("\\.").length - 1]));
+
+                                        } catch (IOException ex) {
+                                            throw new RuntimeException(ex);
+                                        }
+                                    })
+                            ;
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    }
+                }
+                else if(changedArt) {
+                    if(Files.exists(Paths.get("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername()))) {
+                        try (Stream<Path> filePathStream = Files.walk(Paths.get("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername()))){
+                            filePathStream
+                                    .filter(Files::isRegularFile)
+                                    .forEach(path -> {
+                                        try {
+                                            Files.move(path, Paths.get("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + path.getFileName().toString().split("\\.")[path.getFileName().toString().split("\\.").length - 1]));
+
+                                        } catch (IOException ex) {
+                                            throw new RuntimeException(ex);
+                                        }
+                                    })
+                            ;
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    }
+                }
+                else{
+                    if(Files.exists(Paths.get("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername()))) {
+                        try (Stream<Path> filePathStream = Files.walk(Paths.get("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername()))){
+                            filePathStream
+                                    .filter(Files::isRegularFile)
+                                    .forEach(path -> {
+                                        try {
+                                            Files.move(path, Paths.get("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + path.getFileName().toString().split("\\.")[path.getFileName().toString().split("\\.").length - 1]));
+
+                                        } catch (IOException ex) {
+                                            throw new RuntimeException(ex);
+                                        }
+                                    })
+                            ;
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    }
+                    if(Files.exists(Paths.get("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername()))) {
+                        try (Stream<Path> filePathStream = Files.walk(Paths.get("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername()))){
+                            filePathStream
+                                    .filter(Files::isRegularFile)
+                                    .forEach(path -> {
+                                        try {
+                                            Files.move(path, Paths.get("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + path.getFileName().toString().split("\\.")[path.getFileName().toString().split("\\.").length - 1]));
+
+                                        } catch (IOException ex) {
+                                            throw new RuntimeException(ex);
+                                        }
+                                    })
+                            ;
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    }
+
+                }
+            }
             submissionService.update(binder.getBean());
             possibleGoopUser.get(0).setActiveSubmission(true);
             Notification.show("Your submission has been successfully saved");
@@ -118,12 +238,12 @@ public class SubmitView extends Div {
         });
 
         audioUpload.addSucceededListener(e -> {
-            String fileName = submissionID + " || " + e.getFileName();
+            String fileName = submissionID.toString() + "." + e.getFileName().split("\\.")[e.getFileName().split("\\.").length - 1];
             Submission submission = binder.getBean();
             //submission.setAudioFileURL("/uploads/audio/" + fileName);
             submission.setSubmissionID(this.submissionID);
-
-            audioFileURL.setValue("/uploads/audio/" + fileName);
+            this.audioFileName = "src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername() + "/" + fileName;
+            audioFileURL.setValue("/uploads/art/" + authUser.getUsername() + "/" + fileName);
             InputStream inputStream = audioMemoryBuffer.getInputStream();
             try {
                 saveAudioFileToDisk(inputStream, fileName);
@@ -132,8 +252,9 @@ public class SubmitView extends Div {
             }
         } );
         artUpload.addSucceededListener(e -> {
-            String fileName = submissionID.toString() + " || " + e.getFileName();
-            coverArt.setValue("/uploads/art/" + fileName);
+            String fileName = submissionID.toString() + "." + e.getFileName().split("\\.")[e.getFileName().split("\\.").length - 1];
+            this.artFileName = "src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername() + "/" + fileName;
+            coverArt.setValue("/uploads/art/" + authUser.getUsername() + "/" + fileName);
             InputStream inputStream = artMemoryBuffer.getInputStream();
             try {
                 saveArtFileToDisk(inputStream, fileName);
@@ -171,14 +292,38 @@ public class SubmitView extends Div {
     }
 
     private String saveAudioFileToDisk(InputStream inputStream, String fileName) throws IOException {
-        File file = new File("uploads/audio/", fileName);
-        FileUtils.copyInputStreamToFile(inputStream, file);
-        return file.getAbsolutePath();
+        if(Files.exists(Paths.get("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername()))) {
+
+            FileUtils.deleteDirectory(new File("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername()));
+            Files.createDirectory(Paths.get("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername()));
+
+            File file = new File("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername() + "/", fileName);
+            FileUtils.copyInputStreamToFile(inputStream, file);
+            return file.getAbsolutePath();
+        }
+        else {
+            Files.createDirectory(Paths.get("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername()));
+            File file = new File("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername() + "/", fileName);
+            FileUtils.copyInputStreamToFile(inputStream, file);
+            return file.getAbsolutePath();
+        }
     }
     private String saveArtFileToDisk(InputStream inputStream, String fileName) throws IOException {
-        File file = new File("uploads/art/", fileName);
-        FileUtils.copyInputStreamToFile(inputStream, file);
-        return file.getAbsolutePath();
+        if(Files.exists(Paths.get("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername()))) {
+
+            FileUtils.deleteDirectory(new File("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername()));
+            Files.createDirectory(Paths.get("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername()));
+
+            File file = new File("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername() + "/", fileName);
+            FileUtils.copyInputStreamToFile(inputStream, file);
+            return file.getAbsolutePath();
+        }
+        else {
+            Files.createDirectory(Paths.get("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername()));
+            File file = new File("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername() + "/", fileName);
+            FileUtils.copyInputStreamToFile(inputStream, file);
+            return file.getAbsolutePath();
+        }
     }
 
     private void clearForm() {

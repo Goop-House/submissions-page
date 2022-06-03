@@ -38,7 +38,7 @@ public class OutwardUserManagementEndpointController {
                 possibleUser = new User();
             }
         }
-        if(token.equals("ofghap8734yrpawy4prha4fkaiwyg4of7ya0w4fhoaw4hfah4974hpa9w4"))
+        if(token.equals(System.getenv("ADMIN_TOKEN"))) {
             if (possibleUser != null) {
                 try {
                     switch (action) {
@@ -89,6 +89,7 @@ public class OutwardUserManagementEndpointController {
             } else {
                 return ResponseEntity.ok("User does not exist");
             }
+        }
         else {
             return ResponseEntity.ok("Invalid auth");
 
