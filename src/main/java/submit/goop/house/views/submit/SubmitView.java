@@ -201,7 +201,7 @@ public class SubmitView extends Div {
                                     .forEach(path -> {
                                         try {
                                             Files.move(path, Paths.get("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + path.getFileName().toString().split("\\.")[path.getFileName().toString().split("\\.").length - 1]));
-
+                                            audioFileURL.setValue("/uploads/audio/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + path.getFileName().toString().split("\\.")[path.getFileName().toString().split("\\.").length - 1]);
                                         } catch (IOException ex) {
                                             throw new RuntimeException(ex);
                                         }
@@ -218,7 +218,7 @@ public class SubmitView extends Div {
                                     .forEach(path -> {
                                         try {
                                             Files.move(path, Paths.get("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + path.getFileName().toString().split("\\.")[path.getFileName().toString().split("\\.").length - 1]));
-
+                                            coverArt.setValue("/uploads/art/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + path.getFileName().toString().split("\\.")[path.getFileName().toString().split("\\.").length - 1]);
                                         } catch (IOException ex) {
                                             throw new RuntimeException(ex);
                                         }
@@ -352,8 +352,8 @@ public class SubmitView extends Div {
 
         audioUpload.setDropAllowed(true);
         artUpload.setDropAllowed(true);
-        //audioUpload.setAcceptedFileTypes("audio/mp3", "audio/mpeg", "audio/wav", "audio/x-wav", "audio/ogg", "audio/webm");
-        //artUpload.setAcceptedFileTypes("image/png", "image/jpeg", "image/jpg", "image/gif", "image/tiff", "image/svg+xml", "image/webp");
+        audioUpload.setAcceptedFileTypes("audio/mp3", "audio/mpeg", "audio/wav", "audio/x-wav", "audio/ogg", "audio/webm");
+        artUpload.setAcceptedFileTypes("image/png", "image/jpeg", "image/jpg", "image/gif", "image/tiff", "image/svg+xml", "image/webp");
         //submissionID.setReadOnly(true);
         //submissionID.setValue(UUID.randomUUID().toString());
         formLayout.add(mainArtist, title, audioFileURL, coverArt, audioUpload, artUpload);

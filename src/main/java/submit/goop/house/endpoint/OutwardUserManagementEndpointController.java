@@ -1,5 +1,6 @@
 package submit.goop.house.endpoint;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +18,7 @@ import java.util.Collections;
 @RequestMapping("/api/v1/manage")
 public class OutwardUserManagementEndpointController {
 
+    private Dotenv dotenv;
     UserService userService;
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
@@ -24,21 +26,25 @@ public class OutwardUserManagementEndpointController {
         this.userService = userService;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+
+        Dotenv dotenv = null;
+        dotenv = Dotenv.configure().directory("src/main/resources/META-INF/resources/").load();
+        this.dotenv = dotenv;
     }
 
     @RequestMapping(value = "/token={token}&action={action}&user={user}&input={input}", produces = MediaType.APPLICATION_JSON_VALUE)
     //@JsonView(View.Public.class)
     public ResponseEntity<String> get(@PathVariable("token") String token, @PathVariable("action") String action, @PathVariable("user") String user, @PathVariable("input") String input) {
         User possibleUser = userService.findByUsername(user);
-        if(action.equals("create")) {
-            if(possibleUser != null) {
-                return ResponseEntity.ok("User already exists");
-            }
-            else {
-                possibleUser = new User();
-            }
-        }
-        if(token.equals(System.getenv("ADMIN_TOKEN"))) {
+//        if(action.equals("create")) {
+//            if(possibleUser != null) {
+//                return ResponseEntity.ok("User already exists");
+//            }
+//            else {
+//                possibleUser = new User();
+//            }
+//        }
+        if(token.equals(dotenv.get("TOKEN"))) {
             if (possibleUser != null) {
                 try {
                     switch (action) {

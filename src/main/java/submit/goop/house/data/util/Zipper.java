@@ -11,7 +11,7 @@ import java.util.zip.ZipOutputStream;
 
 public class Zipper {
     private final List<String> fileList = new ArrayList<>();
-
+    private final List<File> files2 = new ArrayList<>();
 
     public void compressDirectory(String dir, String zipFile) {
         File directory = new File(dir);
@@ -51,7 +51,7 @@ public class Zipper {
     /**
      * Get files list from the directory recursive to the subdirectory.
      */
-    private void getFileList(File directory) {
+    public List<String> getFileList(File directory) {
         File[] files = directory.listFiles();
         if (files != null && files.length > 0) {
             for (File file : files) {
@@ -63,5 +63,21 @@ public class Zipper {
             }
         }
 
+        return fileList;
+    }
+
+    public List<File> getFiles(File directory) {
+        File[] files = directory.listFiles();
+        if (files != null && files.length > 0) {
+            for (File file : files) {
+                if (file.isFile()) {
+                    files2.add(file);
+                } else {
+                    getFiles(file);
+                }
+            }
+        }
+
+        return files2;
     }
 }

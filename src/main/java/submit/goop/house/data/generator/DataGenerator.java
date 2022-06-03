@@ -20,6 +20,7 @@ import submit.goop.house.data.entity.User;
 import submit.goop.house.data.service.GoopUserRepository;
 import submit.goop.house.data.service.SubmissionRepository;
 import submit.goop.house.data.service.UserRepository;
+import submit.goop.house.endpoint.EventManagementController;
 
 @SpringComponent
 public class DataGenerator {
@@ -73,6 +74,7 @@ public class DataGenerator {
             submission.setTitle("Joe Biden Mixtape");
             submission.setEvent("Goop Week 6");
             submissionRepository.save(submission);
+
 
 
 //            logger.info("... generating 100 Submission entities...");
