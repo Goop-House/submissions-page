@@ -36,8 +36,8 @@ import java.util.concurrent.TimeUnit;
 
 /** @author Leonardo Scardanzan / Flowing Code */
 @Tag("simple-timer")
-@JsModule("./simple-timer/simple-timer.js")
-public class Countdown extends Component implements HasSize, HasStyle, Serializable {
+@JsModule("./views/simple-timer/simple-timer.js")
+public class SimpleTimer extends Component implements HasSize, HasStyle, Serializable {
 
     private static final long serialVersionUID = 1L;
     private static final int START_TIME_S = 60;
@@ -46,7 +46,7 @@ public class Countdown extends Component implements HasSize, HasStyle, Serializa
     private static final String CURRENT_TIME = "currentTime";
 
     /** Creates a timer with a start time of 60 */
-    public Countdown() {
+    public SimpleTimer() {
         this(START_TIME_S);
     }
 
@@ -55,7 +55,7 @@ public class Countdown extends Component implements HasSize, HasStyle, Serializa
      *
      * @param startTime value in seconds for the start time
      */
-    public Countdown(final Number startTime) {
+    public SimpleTimer(final Number startTime) {
         getElement().getStyle().set(DISPLAY, INLINE);
         setStartTime(startTime);
     }
@@ -106,6 +106,24 @@ public class Countdown extends Component implements HasSize, HasStyle, Serializa
      */
     public void setHours(final boolean hours) {
         getElement().setProperty("hours", hours);
+    }
+    /**
+     * Enables showing days and hours and minutes
+     *
+     * @param days
+     */
+    public void setDays(final boolean days) {
+        getElement().setProperty("days", days);
+    }
+
+    /**
+     * Sets the event
+     *
+     * @param countEvent
+     */
+
+    public void setCountEvent(final String countEvent)  {
+        getElement().setProperty("countEvent", countEvent);
     }
 
     /** Starts or stops the timer if it is already started */
@@ -174,13 +192,19 @@ public class Countdown extends Component implements HasSize, HasStyle, Serializa
 
     /** Event that gets triggered when the timer reaches 0 */
     @DomEvent("simple-timer-end")
-    public static class TimerEndedEvent extends ComponentEvent<Countdown> {
+    public static class TimerEndedEvent extends ComponentEvent<SimpleTimer> {
 
-        public TimerEndedEvent(final Countdown source, final boolean fromClient) {
+        public TimerEndedEvent(final SimpleTimer source, final boolean fromClient) {
             super(source, fromClient);
         }
     }
 
+    @DomEvent("simple-timer-current-time-changed")
+    public static class CurrentTimeChangeEvent extends ComponentEvent<SimpleTimer> {
+        public CurrentTimeChangeEvent(final SimpleTimer source, final boolean fromClient) {
+            super(source, fromClient);
+        }
+    }
     /**
      * Adds a timer ended listener that will be triggered when the timer reaches 0
      *
@@ -189,6 +213,10 @@ public class Countdown extends Component implements HasSize, HasStyle, Serializa
      */
     public Registration addTimerEndEvent(final ComponentEventListener<TimerEndedEvent> listener) {
         return addListener(TimerEndedEvent.class, listener);
+    }
+
+    public Registration addCurrentTimeChangeEvent(final ComponentEventListener<CurrentTimeChangeEvent> listener) {
+        return addListener(CurrentTimeChangeEvent.class, listener);
     }
 
     @Override

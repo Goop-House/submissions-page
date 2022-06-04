@@ -25,3 +25,6 @@ src/main/resources/application.properties
 src/main/resources/META-INF/resources/uploads/
 src/main/resources/META-INF/resources/.env
 src/main/java/submit/goop/house/data/util/Constants.java
+
+filebrowser.db
+run-file-browser.sh

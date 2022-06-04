@@ -5,44 +5,38 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.customfield.CustomField;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
-import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.persistence.Lob;
 
-import io.swagger.models.auth.In;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.vaadin.kim.countdownclock.CountdownClock;
 import submit.goop.house.data.entity.GoopUser;
 import submit.goop.house.data.entity.Submission;
 import submit.goop.house.data.entity.User;
 import submit.goop.house.data.service.GoopUserService;
 import submit.goop.house.data.service.SubmissionService;
 import submit.goop.house.data.service.UserService;
+import submit.goop.house.data.util.SimpleTimer;
+import submit.goop.house.endpoint.GoopEvent;
 import submit.goop.house.endpoint.SubmissionsEndpoint;
 import submit.goop.house.views.MainLayout;
 
@@ -53,6 +47,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -88,6 +83,9 @@ public class SubmitView extends Div {
     private GoopUser authGoopUser;
     private SubmissionService submissionService;
     private User authUser;
+
+    private SimpleTimer clock = new SimpleTimer();
+    private Span time = new Span();
 
 
     public SubmitView(SubmissionService submissionService, UserService userService, GoopUserService goopUserService) {
@@ -291,6 +289,8 @@ public class SubmitView extends Div {
             );
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         });
+
+        clock.start();
     }
 
     private void setFormData(Submission submission) {
@@ -371,17 +371,38 @@ public class SubmitView extends Div {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.addClassName("button-layout");
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        Label label = new Label("No active event.");
+        label.addClassName("no-event-label");
         SubmissionsEndpoint submissionsEndpoint = new SubmissionsEndpoint();
-
-        if(submissionsEndpoint.getActiveEvent() != null) {
-            CountdownClock clock = new CountdownClock();
+        GoopEvent goopEvent = submissionsEndpoint.getActiveEvent();
+        if(goopEvent != null) {
+            String endTime = goopEvent.getEndTime();
             Calendar calendar = Calendar.getInstance();
-            calendar.set(Calendar.HOUR_OF_DAY, 23);
+            calendar.set(Integer.parseInt(endTime.split("-")[2]), Integer.parseInt(endTime.split("-")[1])-1, Integer.parseInt(endTime.split("-")[0]), Integer.parseInt(endTime.split("-")[3]), Integer.parseInt(endTime.split("-")[4]), Integer.parseInt(endTime.split("-")[5]));
+            if (!calendar.getTime().after(new Date())) {
+                save.setEnabled(false);
+                label.setText("Time's up! Contact a mod if you have a valid reason you could not submit.");
+                buttonLayout.add(save);
+                buttonLayout.add(label);
+            }
+            else {
+                clock.setFractions(false);
+                clock.setDays(true);
+                clock.setHours(true);
+                clock.setCountEvent(goopEvent.getName());
+                clock.setStartTime((calendar.getTimeInMillis()/1000)-(Calendar.getInstance().getTimeInMillis()/1000));
+                clock.addClassName("clock-style");
+                buttonLayout.add(save);
+                buttonLayout.add(clock);
+                //clock.setFormat("%d days, %h hours, %m minutes and %s seconds until your submission is due!");
+            }
         }
         else {
             save.setEnabled(false);
+            buttonLayout.add(save);
+            buttonLayout.add(label);
         }
-        buttonLayout.add(save);
+
 
         return buttonLayout;
     }

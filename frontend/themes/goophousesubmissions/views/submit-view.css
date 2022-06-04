@@ -8,3 +8,17 @@
   margin-bottom: var(--lumo-space-l);
   margin-top: var(--lumo-space-m);
 }
+.clock-style {
+  color: var(--lumo-secondary-text-color);
+  margin-bottom: var(--lumo-space-s);
+  margin-top: var(--lumo-space-s);
+  font-weight: 600;
+  font-family: var(--lumo-font-family);
+}
+.no-event-label {
+  color: var(--lumo-secondary-text-color);
+  margin-bottom: var(--lumo-space-s);
+  margin-top: var(--lumo-space-s);
+  font-weight: 600;
+  font-family: var(--lumo-font-family);
+}

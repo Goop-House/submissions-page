@@ -100,6 +100,15 @@ Polymer({
             type: Boolean,
             value: false
         },
+
+        /**
+         * Event counting down to
+         */
+        countEvent: {
+            type: String,
+            value: '0'
+        },
+
         /**
          * Time the timer has spent running since it was started
          */
@@ -181,12 +190,12 @@ Polymer({
         hours = this.days ? hours % 24 : hours;
         hours = hours < 10 ? '0' + hours : hours;
 
-        minutes = this.hours ? minutes % 60 : minutes;
+        minutes = this.days || this.hours ? minutes % 60 : minutes;
         minutes = minutes < 10 ? '0' + minutes : minutes;
 
         seconds = this.minutes || this.hours ? seconds % 60 : seconds;
         seconds = seconds < 10 ? '0' + seconds : seconds;
 
-        return (this.days ? days + ':' : '') + (this.hours || this.days ? hours + ':' : '') + (this.minutes || this.hours ? minutes + ':' : '') + seconds + (this.fractions ? ('.' + timeString[1].substring(0,2)) : '')
+        return (this.days ? days + ' days ' : '') + (this.hours || this.days ? hours + ' hours ' : '') + (this.minutes || this.hours ? minutes + ' minutes ' : '') + seconds + ' seconds ' + (this.fractions ? ('.' + timeString[1].substring(0,2)) : '') + (this.countEvent ? 'until your ' + this.countEvent + ' submission is due!' : '') ;
     }
 });
