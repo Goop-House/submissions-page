@@ -36,12 +36,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestAttribute;
+import org.vaadin.kim.countdownclock.CountdownClock;
 import submit.goop.house.data.entity.GoopUser;
 import submit.goop.house.data.entity.Submission;
 import submit.goop.house.data.entity.User;
 import submit.goop.house.data.service.GoopUserService;
 import submit.goop.house.data.service.SubmissionService;
 import submit.goop.house.data.service.UserService;
+import submit.goop.house.endpoint.SubmissionsEndpoint;
 import submit.goop.house.views.MainLayout;
 
 import java.io.File;
@@ -50,6 +52,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -86,6 +89,8 @@ public class SubmitView extends Div {
     private SubmissionService submissionService;
     private User authUser;
 
+    private SubmissionsEndpoint submissionsEndpoint;
+
 
     public SubmitView(SubmissionService submissionService, UserService userService, GoopUserService goopUserService) {
         addClassName("submit-view");
@@ -93,7 +98,11 @@ public class SubmitView extends Div {
         add(createTitle());
         add(createFormLayout());
         //add(createUploadLayout());
-        add(createButtonLayout());
+        try {
+            add(createButtonLayout());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         binder.bindInstanceFields(this);
 
@@ -103,6 +112,8 @@ public class SubmitView extends Div {
         this.authUser = userService.findByUsername(auth.getName());
         this.authGoopUser = possibleGoopUser.get(0);
 //        this.submissionService = submissionService;
+
+        this.submissionsEndpoint = new SubmissionsEndpoint();
 
         if(possibleGoopUser.get(0).isActiveSubmission()) {
             UUID subID = UUID.fromString(possibleGoopUser.get(0).getSubmissions().split(",")[0]);
@@ -360,12 +371,21 @@ public class SubmitView extends Div {
         return formLayout;
     }
 
-    private Component createButtonLayout() {
+    private Component createButtonLayout() throws Exception {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.addClassName("button-layout");
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+        if(submissionsEndpoint.getActiveEvent() != null) {
+            CountdownClock clock = new CountdownClock();
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.HOUR_OF_DAY, 23);
+        }
+        else {
+            save.setEnabled(false);
+        }
         buttonLayout.add(save);
-        //buttonLayout.add(cancel);
+
         return buttonLayout;
     }
 

@@ -22,4 +22,14 @@ public class SubmissionsEndpoint {
         }
         return this.currentDefaultCoverArtURL;
     }
+
+    public GoopEvent getActiveEvent() throws Exception {
+        this.eventList = new EventManagementController().getEvents();
+        for (GoopEvent event : this.eventList) {
+            if (event.isActive()) {
+                return event;
+            }
+        }
+        return null;
+    }
 }

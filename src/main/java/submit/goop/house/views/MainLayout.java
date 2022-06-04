@@ -169,7 +169,7 @@ public class MainLayout extends AppLayout {
 
                 new MenuItemInfo("My Submissions", "la la-th-list", MySubmissionsView.class), //
 
-                new MenuItemInfo("Manage Active Submission or New Submission", "la la-upload", SubmitView.class), //
+                new MenuItemInfo("Active Submissions", "la la-upload", SubmitView.class), //
 
         };
     }
