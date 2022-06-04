@@ -2,17 +2,12 @@ package submit.goop.house.views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
+import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.dependency.NpmPackage;
-import com.vaadin.flow.component.html.Anchor;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.Header;
-import com.vaadin.flow.component.html.ListItem;
-import com.vaadin.flow.component.html.Nav;
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.html.UnorderedList;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.VaadinSession;
@@ -50,12 +45,12 @@ public class MainLayout extends AppLayout {
             this.view = view;
             RouterLink link = new RouterLink();
             // Use Lumo classnames for various styling
-            link.addClassNames("flex", "h-m", "items-center", "px-s", "relative", "text-secondary");
+            link.addClassNames("menu-item-link");
             link.setRoute(view);
 
             Span text = new Span(menuTitle);
             // Use Lumo classnames for various styling
-            text.addClassNames("font-medium", "text-s", "whitespace-nowrap");
+            text.addClassNames("menu-item-text");
 
             link.add(new LineAwesomeIcon(iconClass), text);
             add(link);
@@ -86,60 +81,104 @@ public class MainLayout extends AppLayout {
     private AccessAnnotationChecker accessChecker;
 
     private UserService userService;
+    private H1 viewTitle;
 
     public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker, UserService userService) {
         this.authenticatedUser = authenticatedUser;
         this.accessChecker = accessChecker;
         this.userService = userService;
 
-        addToNavbar(createHeaderContent());
+        setPrimarySection(Section.DRAWER);
+        addToNavbar(true, createHeaderContent());
+        addToDrawer(createDrawerContent());
 
 
     }
 
     private Component createHeaderContent() {
-        Header header = new Header();
-        header.addClassNames("bg-base", "border-b", "border-contrast-10", "box-border", "flex", "flex-col", "w-full");
+//        Header header = new Header();
+//        header.addClassNames("bg-base", "border-b", "border-contrast-10", "box-border", "flex", "flex-col", "w-full");
+//
+//        Div layout = new Div();
+//        layout.addClassNames("flex", "h-xl", "items-center", "px-l");
+//
+//        H1 appName = new H1("Goop House Submissions");
+//        appName.addClassNames("my-0", "me-auto", "text-l");
+//        layout.add(appName);
+//
+//        Optional<User> maybeUser = authenticatedUser.get();
+//        if (maybeUser.isPresent()) {
+//            User user = maybeUser.get();
+//
+//            Avatar avatar = new Avatar(user.getName(), user.getProfilePictureUrl());
+//            avatar.addClassNames("me-xs");
+//
+//            ContextMenu userMenu = new ContextMenu(avatar);
+//            userMenu.setOpenOnClick(true);
+//            userMenu.addItem("Logout", e -> {
+//                authenticatedUser.logout();
+//            });
+//
+//            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//            User pos = userService.findByUsername(auth.getName());
+//            Span name = new Span(pos.getName());
+//            name.addClassNames("font-medium", "text-s", "text-secondary");
+//
+//            Span role = new Span(pos.getRoles().toString());
+//
+//            layout.add(avatar, name);
+//        } else {
+//            Anchor loginLink = new Anchor("login", "Sign in");
+//            layout.add(loginLink);
+//        }
+//
+//        Nav nav = new Nav();
+//        nav.addClassNames("flex", "gap-s", "overflow-auto", "px-m");
+//
+//        // Wrap the links in a list; improves accessibility
+//        UnorderedList list = new UnorderedList();
+//        list.addClassNames("flex", "list-none", "m-0", "p-0");
+//        nav.add(list);
+//
+//        for (MenuItemInfo menuItem : createMenuItems()) {
+//            if (accessChecker.hasAccess(menuItem.getView())) {
+//                list.add(menuItem);
+//            }
+//
+//        }
+//
+//        header.add(layout, nav);
+//        return header;
+        DrawerToggle toggle = new DrawerToggle();
+        toggle.addClassNames("view-toggle");
+        toggle.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+        toggle.getElement().setAttribute("aria-label", "Menu toggle");
 
-        Div layout = new Div();
-        layout.addClassNames("flex", "h-xl", "items-center", "px-l");
+        viewTitle = new H1();
+        viewTitle.addClassNames("view-title");
 
-        H1 appName = new H1("Goop House Submissions");
-        appName.addClassNames("my-0", "me-auto", "text-l");
-        layout.add(appName);
+        Header header = new Header(toggle, viewTitle);
+        header.addClassNames("view-header");
+        return header;
+    }
 
-        Optional<User> maybeUser = authenticatedUser.get();
-        if (maybeUser.isPresent()) {
-            User user = maybeUser.get();
+    private Component createDrawerContent() {
+        H2 appName = new H2("Goop House Submissions");
+        appName.addClassNames("app-name");
 
-            Avatar avatar = new Avatar(user.getName(), user.getProfilePictureUrl());
-            avatar.addClassNames("me-xs");
-
-            ContextMenu userMenu = new ContextMenu(avatar);
-            userMenu.setOpenOnClick(true);
-            userMenu.addItem("Logout", e -> {
-                authenticatedUser.logout();
-            });
-
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            User pos = userService.findByUsername(auth.getName());
-            Span name = new Span(pos.getName());
-            name.addClassNames("font-medium", "text-s", "text-secondary");
-
-            Span role = new Span(pos.getRoles().toString());
-
-            layout.add(avatar, name);
-        } else {
-            Anchor loginLink = new Anchor("login", "Sign in");
-            layout.add(loginLink);
-        }
-
+        com.vaadin.flow.component.html.Section section = new com.vaadin.flow.component.html.Section(appName,
+                createNavigation(), createFooter());
+        section.addClassNames("drawer-section");
+        return section;
+    }
+    private Nav createNavigation() {
         Nav nav = new Nav();
-        nav.addClassNames("flex", "gap-s", "overflow-auto", "px-m");
+        nav.addClassNames("menu-item-container");
+        nav.getElement().setAttribute("aria-labelledby", "views");
 
         // Wrap the links in a list; improves accessibility
         UnorderedList list = new UnorderedList();
-        list.addClassNames("flex", "list-none", "m-0", "p-0");
+        list.addClassNames("navigation-list");
         nav.add(list);
 
         for (MenuItemInfo menuItem : createMenuItems()) {
@@ -148,11 +187,8 @@ public class MainLayout extends AppLayout {
             }
 
         }
-
-        header.add(layout, nav);
-        return header;
+        return nav;
     }
-
     private MenuItemInfo[] createMenuItems() {
         return new MenuItemInfo[]{ //
                 new MenuItemInfo("About", "la la-broadcast-tower", AboutView.class), //
@@ -172,6 +208,46 @@ public class MainLayout extends AppLayout {
                 new MenuItemInfo("Active Submissions", "la la-upload", SubmitView.class), //
 
         };
+    }
+
+    private Footer createFooter() {
+        Footer layout = new Footer();
+        layout.addClassNames("footer");
+
+        Optional<User> maybeUser = authenticatedUser.get();
+        if (maybeUser.isPresent()) {
+            User user = maybeUser.get();
+
+            Avatar avatar = new Avatar(user.getName(), user.getProfilePictureUrl());
+            avatar.addClassNames("me-xs");
+
+            ContextMenu userMenu = new ContextMenu(avatar);
+            userMenu.setOpenOnClick(true);
+            userMenu.addItem("Logout", e -> {
+                authenticatedUser.logout();
+            });
+
+            Span name = new Span(user.getName());
+            name.addClassNames("font-medium", "text-s", "text-secondary");
+
+            layout.add(avatar, name);
+        } else {
+            Anchor loginLink = new Anchor("login", "Sign in");
+            layout.add(loginLink);
+        }
+
+        return layout;
+    }
+
+    @Override
+    protected void afterNavigation() {
+        super.afterNavigation();
+        viewTitle.setText(getCurrentPageTitle());
+    }
+
+    private String getCurrentPageTitle() {
+        PageTitle title = getContent().getClass().getAnnotation(PageTitle.class);
+        return title == null ? "" : title.value();
     }
 
 }

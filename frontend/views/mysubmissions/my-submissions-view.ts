@@ -19,7 +19,7 @@ export class MySubmissionsView extends LitElement {
         <vaadin-horizontal-layout class="items-center justify-between">
           <vaadin-vertical-layout>
             <h2 class="mb-0 mt-xl text-3xl">Your Submissions</h2>
-            <p class="mb-xl mt-0 text-secondary">Everything you have submitted to Goop House through this website.</p>
+            <p class="mb-xl mt-0 text-secondary">Everything you have submitted to Goop House through this website. &emsp; &emsp; &emsp;</p>
           </vaadin-vertical-layout>
           <vaadin-select label="Sort by" id="sortBy"></vaadin-select>
         </vaadin-horizontal-layout>

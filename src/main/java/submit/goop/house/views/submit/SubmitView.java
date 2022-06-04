@@ -57,7 +57,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-@PageTitle("Manage Active Submission or new Submission")
+@PageTitle("Active Submissions")
 @Route(value = "submit", layout = MainLayout.class)
 @RolesAllowed("user")
 @Uses(Icon.class)
@@ -89,8 +89,6 @@ public class SubmitView extends Div {
     private SubmissionService submissionService;
     private User authUser;
 
-    private SubmissionsEndpoint submissionsEndpoint;
-
 
     public SubmitView(SubmissionService submissionService, UserService userService, GoopUserService goopUserService) {
         addClassName("submit-view");
@@ -112,8 +110,6 @@ public class SubmitView extends Div {
         this.authUser = userService.findByUsername(auth.getName());
         this.authGoopUser = possibleGoopUser.get(0);
 //        this.submissionService = submissionService;
-
-        this.submissionsEndpoint = new SubmissionsEndpoint();
 
         if(possibleGoopUser.get(0).isActiveSubmission()) {
             UUID subID = UUID.fromString(possibleGoopUser.get(0).getSubmissions().split(",")[0]);
@@ -375,6 +371,7 @@ public class SubmitView extends Div {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.addClassName("button-layout");
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        SubmissionsEndpoint submissionsEndpoint = new SubmissionsEndpoint();
 
         if(submissionsEndpoint.getActiveEvent() != null) {
             CountdownClock clock = new CountdownClock();
