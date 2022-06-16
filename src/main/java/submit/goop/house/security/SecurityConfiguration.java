@@ -33,7 +33,7 @@ public class SecurityConfiguration extends VaadinWebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception {
         super.configure(web);
-        web.ignoring().antMatchers("/images/*.png", "/error", "favicon.ico", "/api/v1/endpoint/*", "/api/v1/manage/*", "/api/v1/export/*", "/api/v1/events/*", "/uploads");
+        web.ignoring().antMatchers("/images/**","/images/icons/*.png", "/error", "favicon.ico", "/api/v1/endpoint/*", "/api/v1/manage/*", "/api/v1/export/*", "/api/v1/events/*", "/uploads");
 
     }
 }

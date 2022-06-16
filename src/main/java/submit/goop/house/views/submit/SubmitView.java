@@ -38,6 +38,7 @@ import submit.goop.house.data.service.UserService;
 import submit.goop.house.data.util.SimpleTimer;
 import submit.goop.house.endpoint.GoopEvent;
 import submit.goop.house.endpoint.SubmissionsEndpoint;
+import submit.goop.house.data.service.GoopUserRepository;
 import submit.goop.house.views.MainLayout;
 
 import java.io.File;
@@ -86,9 +87,10 @@ public class SubmitView extends Div {
 
     private SimpleTimer clock = new SimpleTimer();
     private Span time = new Span();
+    private TextField event = new TextField("Event");
 
 
-    public SubmitView(SubmissionService submissionService, UserService userService, GoopUserService goopUserService) {
+    public SubmitView(SubmissionService submissionService, UserService userService, GoopUserService goopUserService, GoopUserRepository goopUserRepository) {
         addClassName("submit-view");
 
         add(createTitle());
@@ -124,6 +126,21 @@ public class SubmitView extends Div {
 
         //cancel.addClickListener(e -> clearForm());
         save.addClickListener(e -> {
+            authGoopUser.setActiveSubmission(true);
+            if(authGoopUser.getSubmissions() == null){
+                authGoopUser.setSubmissions(submissionID.toString());
+            }
+            else{
+                if(authGoopUser.getSubmissions().equals("")){
+                    authGoopUser.setSubmissions(submissionID.toString());
+                }
+                else{
+                    if(!authGoopUser.getSubmissions().contains(submissionID.toString())){
+                        authGoopUser.setSubmissions(authGoopUser.getSubmissions() + "," + submissionID.toString());
+                    }
+                }
+            }
+            goopUserRepository.save(authGoopUser);
             boolean changedAudio = false;
             try {
                 if(new File(audioFileName).exists()) {
@@ -237,7 +254,6 @@ public class SubmitView extends Div {
                 }
             }
             submissionService.update(binder.getBean());
-            possibleGoopUser.get(0).setActiveSubmission(true);
             Notification.show("Your submission has been successfully saved");
             //clearForm();
         });
@@ -289,6 +305,19 @@ public class SubmitView extends Div {
             );
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         });
+        SubmissionsEndpoint submissionsEndpoint = new SubmissionsEndpoint();
+        GoopEvent goopEvent = null;
+        try {
+            goopEvent = submissionsEndpoint.getActiveEvent();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if(goopEvent != null) {
+            event.setValue(goopEvent.getName());
+        }
+        else {
+            event.setValue("No Active Event");
+        }
 
         clock.start();
     }
@@ -361,9 +390,14 @@ public class SubmitView extends Div {
         artUpload.setDropAllowed(true);
         audioUpload.setAcceptedFileTypes("audio/mp3", "audio/mpeg", "audio/wav", "audio/x-wav", "audio/ogg", "audio/webm");
         artUpload.setAcceptedFileTypes("image/png", "image/jpeg", "image/jpg", "image/gif", "image/tiff", "image/svg+xml", "image/webp");
+        event.setRequired(true);
+        event.setRequiredIndicatorVisible(true);
+        event.setErrorMessage("This field is required");
+        event.setReadOnly(true);
+        formLayout.add(mainArtist, title, audioFileURL, coverArt, audioUpload, artUpload, event);
         //submissionID.setReadOnly(true);
         //submissionID.setValue(UUID.randomUUID().toString());
-        formLayout.add(mainArtist, title, audioFileURL, coverArt, audioUpload, artUpload);
+        //formLayout.add(mainArtist, title, audioFileURL, coverArt, audioUpload, artUpload);
         return formLayout;
     }
 

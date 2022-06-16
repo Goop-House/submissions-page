@@ -49,9 +49,12 @@ public class MySubmissionsView extends LitTemplate implements HasComponents, Has
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         List<GoopUser> possibleGoopUser = goopUserService.findByDiscordID(auth.getName());
         GoopUser goopUser = possibleGoopUser.get(0);
-        if(goopUser.getSubmissions() == null) {
-            //add(new MySubmissionsViewCard("Looks like you don't have any submissions yet!", "N/A", "https://twirpz.files.wordpress.com/2015/06/twitter-avi-gender-balanced-figure.png", "N/A"));
+        if(goopUser.getSubmissions() == null){
+            add(new MySubmissionsViewCard("Looks like you don't have any submissions yet!", "N/A", "https://twirpz.files.wordpress.com/2015/06/twitter-avi-gender-balanced-figure.png", "N/A"));
             assert true;
+        }
+        else if(goopUser.getSubmissions().equals("")){
+            add(new MySubmissionsViewCard("Looks like you don't have any submissions yet!", "N/A", "https://twirpz.files.wordpress.com/2015/06/twitter-avi-gender-balanced-figure.png", "N/A"));
         }
         else {
             ArrayList<String> submissionIDs = new ArrayList<String>(Arrays.asList(goopUser.getSubmissions().split(",")));
@@ -71,7 +74,7 @@ public class MySubmissionsView extends LitTemplate implements HasComponents, Has
                 try {
                     String songName = submission.getTitle() == null ? "Unknown" : submission.getTitle();
                     String event = submission.getEvent() == null ? "Unknown" : submission.getEvent();
-                    //String imageURL = submission.getCoverArt() ==  null ? submissionsEndpoint.getEventArt(event) : submission.getCoverArt();
+//String imageURL = submission.getCoverArt() ==  null ? submissionsEndpoint.getEventArt(event) : submission.getCoverArt();
                     String imageURL = submissionsEndpoint.getEventArt(event);
                     String artistName = submission.getMainArtist() == null ? "Unknown" : submission.getMainArtist();
 
