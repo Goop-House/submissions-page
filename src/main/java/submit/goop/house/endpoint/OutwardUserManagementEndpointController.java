@@ -1,6 +1,5 @@
 package submit.goop.house.endpoint;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,7 +17,6 @@ import java.util.Collections;
 @RequestMapping("/api/v1/manage")
 public class OutwardUserManagementEndpointController {
 
-    private Dotenv dotenv;
     UserService userService;
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
@@ -27,9 +25,6 @@ public class OutwardUserManagementEndpointController {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
 
-        Dotenv dotenv = null;
-        dotenv = Dotenv.configure().directory("src/main/resources/META-INF/resources/").load();
-        this.dotenv = dotenv;
     }
 
     @RequestMapping(value = "/token={token}&action={action}&user={user}&input={input}", produces = MediaType.APPLICATION_JSON_VALUE)

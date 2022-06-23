@@ -1,6 +1,5 @@
 package submit.goop.house.endpoint;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import org.apache.commons.io.FileUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,12 +21,9 @@ import java.util.List;
 @RequestMapping("/api/v1/export")
 public class OutwardExportEndpointController {
 
-    private Dotenv dotenv;
 
     public OutwardExportEndpointController() {
-        Dotenv dotenv = null;
-        dotenv = Dotenv.configure().directory("src/main/resources/META-INF/resources/").load();
-        this.dotenv = dotenv;
+
     }
 
     @RequestMapping(value = "/token={token}&type={type}", produces = MediaType.APPLICATION_JSON_VALUE)
