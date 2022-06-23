@@ -44,7 +44,7 @@ public class OutwardUserManagementEndpointController {
 //                possibleUser = new User();
 //            }
 //        }
-        if(token.equals(dotenv.get("TOKEN"))) {
+        if(token.equals(System.getenv("TOKEN"))) {
             if (possibleUser != null) {
                 try {
                     switch (action) {

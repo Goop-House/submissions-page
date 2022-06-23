@@ -33,7 +33,7 @@ public class OutwardExportEndpointController {
     @RequestMapping(value = "/token={token}&type={type}", produces = MediaType.APPLICATION_JSON_VALUE)
     //@JsonView(View.Public.class)
     public ResponseEntity<String> get(@PathVariable("token") String token, @PathVariable("type") String type) throws IOException {
-        if(token.equals(dotenv.get("TOKEN"))) {
+        if(token.equals(System.getenv("TOKEN"))) {
             if (type.equals("audio")) {
                 String tempDir = "src/main/resources/META-INF/resources/uploads/audio/temp/";
                 String zipFile = "src/main/resources/META-INF/resources/uploads/export/" + "audio-" + LocalTime.now() + ".zip";
