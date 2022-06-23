@@ -31,14 +31,14 @@ public class OutwardExportEndpointController {
     public ResponseEntity<String> get(@PathVariable("token") String token, @PathVariable("type") String type) throws IOException {
         if(token.equals(System.getenv("TOKEN"))) {
             if (type.equals("audio")) {
-                String tempDir = "src/main/resources/META-INF/resources/uploads/audio/temp/";
-                String zipFile = "src/main/resources/META-INF/resources/uploads/export/" + "audio-" + LocalTime.now() + ".zip";
+                String tempDir = System.getenv("RSRC_PATH") + "/uploads/audio/temp/";
+                String zipFile = System.getenv("RSRC_PATH") + "/uploads/export/" + "audio-" + LocalTime.now() + ".zip";
                 Zipper zip = new Zipper();
 
-                Files.createDirectory(Paths.get("src/main/resources/META-INF/resources/uploads/audio/temp/"));
-                List<File> files = zip.getFiles(new File("src/main/resources/META-INF/resources/uploads/audio/"));
+                Files.createDirectory(Paths.get(System.getenv("RSRC_PATH") + "/uploads/audio/temp/"));
+                List<File> files = zip.getFiles(new File(System.getenv("RSRC_PATH") + "/uploads/audio/"));
                 for (File file : files) {
-                    FileUtils.copyFile(file, new File("src/main/resources/META-INF/resources/uploads/audio/temp/" + file.getName()));
+                    FileUtils.copyFile(file, new File(System.getenv("RSRC_PATH") + "/uploads/audio/temp/" + file.getName()));
                 }
 
                 zip.compressDirectory(tempDir, zipFile);
@@ -48,14 +48,14 @@ public class OutwardExportEndpointController {
                 return ResponseEntity.ok(zipFile);
             }
             else if(type.equals("art")) {
-                String tempDir = "src/main/resources/META-INF/resources/uploads/art/temp/";
-                String zipFile = "src/main/resources/META-INF/resources/uploads/export/" + "art-" + LocalTime.now() + ".zip";
+                String tempDir = System.getenv("RSRC_PATH") + "/uploads/art/temp/";
+                String zipFile = System.getenv("RSRC_PATH") + "/uploads/export/" + "art-" + LocalTime.now() + ".zip";
                 Zipper zip = new Zipper();
 
-                Files.createDirectory(Paths.get("src/main/resources/META-INF/resources/uploads/art/temp/"));
-                List<File> files = zip.getFiles(new File("src/main/resources/META-INF/resources/uploads/art/"));
+                Files.createDirectory(Paths.get(System.getenv("RSRC_PATH") + "/uploads/art/temp/"));
+                List<File> files = zip.getFiles(new File(System.getenv("RSRC_PATH") + "/uploads/art/"));
                 for (File file : files) {
-                    FileUtils.copyFile(file, new File("src/main/resources/META-INF/resources/uploads/art/temp/" + file.getName()));
+                    FileUtils.copyFile(file, new File(System.getenv("RSRC_PATH") + "/uploads/art/temp/" + file.getName()));
                 }
 
                 zip.compressDirectory(tempDir, zipFile);
