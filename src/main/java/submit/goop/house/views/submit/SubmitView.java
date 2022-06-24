@@ -146,7 +146,7 @@ public class SubmitView extends Div {
                 if(new File(audioFileName).exists()) {
                     File savedAudioFile = new File(audioFileName);
                     try {
-                        Files.move(Paths.get("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername() + "/" + savedAudioFile.getName()), Paths.get("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + savedAudioFile.getName().split("\\.")[savedAudioFile.getName().split("\\.").length - 1]));
+                        Files.move(Paths.get(System.getenv("RSRC_PATH") + "/uploads/audio/" + authUser.getUsername() + "/" + savedAudioFile.getName()), Paths.get(System.getenv("RSRC_PATH") + "/uploads/audio/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + savedAudioFile.getName().split("\\.")[savedAudioFile.getName().split("\\.").length - 1]));
                         audioFileURL.setValue("/uploads/audio/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + savedAudioFile.getName().split("\\.")[savedAudioFile.getName().split("\\.").length - 1]);
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
@@ -164,7 +164,7 @@ public class SubmitView extends Div {
                 if (new File(artFileName).exists()) {
                     File savedArtFile = new File(artFileName);
                     try {
-                        Files.move(Paths.get("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername() + "/" + savedArtFile.getName()), Paths.get("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + savedArtFile.getName().split("\\.")[savedArtFile.getName().split("\\.").length - 1]));
+                        Files.move(Paths.get(System.getenv("RSRC_PATH") + "/uploads/art/" + authUser.getUsername() + "/" + savedArtFile.getName()), Paths.get(System.getenv("RSRC_PATH") + "/uploads/art/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + savedArtFile.getName().split("\\.")[savedArtFile.getName().split("\\.").length - 1]));
                         coverArt.setValue("/uploads/art/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + savedArtFile.getName().split("\\.")[savedArtFile.getName().split("\\.").length - 1]);
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
@@ -178,13 +178,13 @@ public class SubmitView extends Div {
 
             if(!(changedAudio && changedArt)) {
                 if(changedAudio) {
-                    if(Files.exists(Paths.get("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername()))) {
-                        try (Stream<Path> filePathStream = Files.walk(Paths.get("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername()))){
+                    if(Files.exists(Paths.get(System.getenv("RSRC_PATH") + "/uploads/art/" + authUser.getUsername()))) {
+                        try (Stream<Path> filePathStream = Files.walk(Paths.get(System.getenv("RSRC_PATH") + "/uploads/art/" + authUser.getUsername()))){
                             filePathStream
                                     .filter(Files::isRegularFile)
                                     .forEach(path -> {
                                         try {
-                                            Files.move(path, Paths.get("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + path.getFileName().toString().split("\\.")[path.getFileName().toString().split("\\.").length - 1]));
+                                            Files.move(path, Paths.get(System.getenv("RSRC_PATH") + "/uploads/art/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + path.getFileName().toString().split("\\.")[path.getFileName().toString().split("\\.").length - 1]));
 
                                         } catch (IOException ex) {
                                             throw new RuntimeException(ex);
@@ -197,13 +197,13 @@ public class SubmitView extends Div {
                     }
                 }
                 else if(changedArt) {
-                    if(Files.exists(Paths.get("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername()))) {
-                        try (Stream<Path> filePathStream = Files.walk(Paths.get("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername()))){
+                    if(Files.exists(Paths.get(System.getenv("RSRC_PATH") + "/uploads/audio/" + authUser.getUsername()))) {
+                        try (Stream<Path> filePathStream = Files.walk(Paths.get(System.getenv("RSRC_PATH") + "/uploads/audio/" + authUser.getUsername()))){
                             filePathStream
                                     .filter(Files::isRegularFile)
                                     .forEach(path -> {
                                         try {
-                                            Files.move(path, Paths.get("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + path.getFileName().toString().split("\\.")[path.getFileName().toString().split("\\.").length - 1]));
+                                            Files.move(path, Paths.get(System.getenv("RSRC_PATH") + "/uploads/audio/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + path.getFileName().toString().split("\\.")[path.getFileName().toString().split("\\.").length - 1]));
 
                                         } catch (IOException ex) {
                                             throw new RuntimeException(ex);
@@ -216,13 +216,13 @@ public class SubmitView extends Div {
                     }
                 }
                 else{
-                    if(Files.exists(Paths.get("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername()))) {
-                        try (Stream<Path> filePathStream = Files.walk(Paths.get("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername()))){
+                    if(Files.exists(Paths.get(System.getenv("RSRC_PATH") + "/uploads/audio/" + authUser.getUsername()))) {
+                        try (Stream<Path> filePathStream = Files.walk(Paths.get(System.getenv("RSRC_PATH") + "/uploads/audio/" + authUser.getUsername()))){
                             filePathStream
                                     .filter(Files::isRegularFile)
                                     .forEach(path -> {
                                         try {
-                                            Files.move(path, Paths.get("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + path.getFileName().toString().split("\\.")[path.getFileName().toString().split("\\.").length - 1]));
+                                            Files.move(path, Paths.get(System.getenv("RSRC_PATH") + "/uploads/audio/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + path.getFileName().toString().split("\\.")[path.getFileName().toString().split("\\.").length - 1]));
                                             audioFileURL.setValue("/uploads/audio/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + path.getFileName().toString().split("\\.")[path.getFileName().toString().split("\\.").length - 1]);
                                         } catch (IOException ex) {
                                             throw new RuntimeException(ex);
@@ -233,13 +233,13 @@ public class SubmitView extends Div {
                             throw new RuntimeException(ex);
                         }
                     }
-                    if(Files.exists(Paths.get("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername()))) {
-                        try (Stream<Path> filePathStream = Files.walk(Paths.get("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername()))){
+                    if(Files.exists(Paths.get(System.getenv("RSRC_PATH") + "/uploads/art/" + authUser.getUsername()))) {
+                        try (Stream<Path> filePathStream = Files.walk(Paths.get(System.getenv("RSRC_PATH") + "/uploads/art/" + authUser.getUsername()))){
                             filePathStream
                                     .filter(Files::isRegularFile)
                                     .forEach(path -> {
                                         try {
-                                            Files.move(path, Paths.get("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + path.getFileName().toString().split("\\.")[path.getFileName().toString().split("\\.").length - 1]));
+                                            Files.move(path, Paths.get(System.getenv("RSRC_PATH") + "/uploads/art/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + path.getFileName().toString().split("\\.")[path.getFileName().toString().split("\\.").length - 1]));
                                             coverArt.setValue("/uploads/art/" + authUser.getUsername() + "/" + mainArtist.getValue() + " - " + title.getValue() + "." + path.getFileName().toString().split("\\.")[path.getFileName().toString().split("\\.").length - 1]);
                                         } catch (IOException ex) {
                                             throw new RuntimeException(ex);
@@ -263,7 +263,7 @@ public class SubmitView extends Div {
             Submission submission = binder.getBean();
             //submission.setAudioFileURL("/uploads/audio/" + fileName);
             submission.setSubmissionID(this.submissionID);
-            this.audioFileName = "src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername() + "/" + fileName;
+            this.audioFileName = System.getenv("RSRC_PATH") + "/uploads/audio/" + authUser.getUsername() + "/" + fileName;
             audioFileURL.setValue("/uploads/art/" + authUser.getUsername() + "/" + fileName);
             InputStream inputStream = audioMemoryBuffer.getInputStream();
             try {
@@ -274,7 +274,7 @@ public class SubmitView extends Div {
         } );
         artUpload.addSucceededListener(e -> {
             String fileName = submissionID.toString() + "." + e.getFileName().split("\\.")[e.getFileName().split("\\.").length - 1];
-            this.artFileName = "src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername() + "/" + fileName;
+            this.artFileName = System.getenv("RSRC_PATH") + "/uploads/art/" + authUser.getUsername() + "/" + fileName;
             coverArt.setValue("/uploads/art/" + authUser.getUsername() + "/" + fileName);
             InputStream inputStream = artMemoryBuffer.getInputStream();
             try {
@@ -328,35 +328,35 @@ public class SubmitView extends Div {
     }
 
     private String saveAudioFileToDisk(InputStream inputStream, String fileName) throws IOException {
-        if(Files.exists(Paths.get("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername()))) {
+        if(Files.exists(Paths.get(System.getenv("RSRC_PATH") + "/uploads/audio/" + authUser.getUsername()))) {
 
-            FileUtils.deleteDirectory(new File("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername()));
-            Files.createDirectory(Paths.get("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername()));
+            FileUtils.deleteDirectory(new File(System.getenv("RSRC_PATH") + "/uploads/audio/" + authUser.getUsername()));
+            Files.createDirectory(Paths.get(System.getenv("RSRC_PATH") + "/uploads/audio/" + authUser.getUsername()));
 
-            File file = new File("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername() + "/", fileName);
+            File file = new File(System.getenv("RSRC_PATH") + "/uploads/audio/" + authUser.getUsername() + "/", fileName);
             FileUtils.copyInputStreamToFile(inputStream, file);
             return file.getAbsolutePath();
         }
         else {
-            Files.createDirectory(Paths.get("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername()));
-            File file = new File("src/main/resources/META-INF/resources/uploads/audio/" + authUser.getUsername() + "/", fileName);
+            Files.createDirectory(Paths.get(System.getenv("RSRC_PATH") + "/uploads/audio/" + authUser.getUsername()));
+            File file = new File(System.getenv("RSRC_PATH") + "/uploads/audio/" + authUser.getUsername() + "/", fileName);
             FileUtils.copyInputStreamToFile(inputStream, file);
             return file.getAbsolutePath();
         }
     }
     private String saveArtFileToDisk(InputStream inputStream, String fileName) throws IOException {
-        if(Files.exists(Paths.get("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername()))) {
+        if(Files.exists(Paths.get(System.getenv("RSRC_PATH") + "/uploads/art/" + authUser.getUsername()))) {
 
-            FileUtils.deleteDirectory(new File("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername()));
-            Files.createDirectory(Paths.get("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername()));
+            FileUtils.deleteDirectory(new File(System.getenv("RSRC_PATH") + "/uploads/art/" + authUser.getUsername()));
+            Files.createDirectory(Paths.get(System.getenv("RSRC_PATH") + "/uploads/art/" + authUser.getUsername()));
 
-            File file = new File("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername() + "/", fileName);
+            File file = new File(System.getenv("RSRC_PATH") + "/uploads/art/" + authUser.getUsername() + "/", fileName);
             FileUtils.copyInputStreamToFile(inputStream, file);
             return file.getAbsolutePath();
         }
         else {
-            Files.createDirectory(Paths.get("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername()));
-            File file = new File("src/main/resources/META-INF/resources/uploads/art/" + authUser.getUsername() + "/", fileName);
+            Files.createDirectory(Paths.get(System.getenv("RSRC_PATH") + "/uploads/art/" + authUser.getUsername()));
+            File file = new File(System.getenv("RSRC_PATH") + "/uploads/art/" + authUser.getUsername() + "/", fileName);
             FileUtils.copyInputStreamToFile(inputStream, file);
             return file.getAbsolutePath();
         }
