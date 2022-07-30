@@ -22,6 +22,8 @@ node{
          docker rmi bardiaanvari/goophousesubmissions:latest; \
          docker pull bardiaanvari/goophousesubmissions:latest && \
          docker run -p 777:777 -d \
+         --network host \
+         --user root \
          --name goop-house-submissions -e \
          TOKEN='290384fo8324gf2g4072934ghro2847wert5gw45hw5wu5w4u5wu65w5w5tthth' -e \
          RSRC_PATH='/app' -v \
@@ -29,6 +31,8 @@ node{
          bardiaanvari/goophousesubmissions:latest
          '''
          def dockerRun2 = '''docker run -p 777:777 -d \
+         --network host \
+         --user root \
          --name goop-house-submissions -e \
          TOKEN='290384fo8324gf2g4072934ghro2847wert5gw45hw5wu5w4u5wu65w5w5tthth' -e \
          RSRC_PATH='/app' -v \
