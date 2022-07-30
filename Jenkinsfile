@@ -37,12 +37,12 @@ node{
          '''
          try{
              sshagent(['dionysus-portainer']) {
-               sh "ssh -o StrictHostKeyChecking=no bardia@192.168.0.34 ${dockerRun}"
+               sh "ssh -o StrictHostKeyChecking=no bardia@192.168.0.14 ${dockerRun}"
              }
             } catch(Exception e){
                 echo "Container does not exist, creating."
                 sshagent(['dionysus-portainer']) {
-                    sh "ssh -o StrictHostKeyChecking=no bardia@192.168.0.34 ${dockerRun2}"
+                    sh "ssh -o StrictHostKeyChecking=no bardia@192.168.0.14 ${dockerRun2}"
                 }
             }
             
