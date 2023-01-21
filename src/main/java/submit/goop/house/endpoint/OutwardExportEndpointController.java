@@ -29,6 +29,8 @@ public class OutwardExportEndpointController {
     @RequestMapping(value = "/token={token}&type={type}", produces = MediaType.APPLICATION_JSON_VALUE)
     //@JsonView(View.Public.class)
     public ResponseEntity<String> get(@PathVariable("token") String token, @PathVariable("type") String type) throws IOException {
+        System.out.println(System.getenv("TOKEN"));
+        System.out.println(token);
         if(token.equals(System.getenv("TOKEN"))) {
             if (type.equals("audio")) {
                 String tempDir = System.getenv("RSRC_PATH") + "/uploads/audio/temp/";

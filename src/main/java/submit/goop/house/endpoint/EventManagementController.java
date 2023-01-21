@@ -17,8 +17,9 @@ public class EventManagementController {
     public EventManagementController() {
     }
 
+    //"http://localhost:55554/api/v1/events/"
     public List<GoopEvent> getEvents() throws Exception {
-        String jsonGoopEventArray = makeRequest("http://192.168.0.14:55555/api/v1/events/");
+        String jsonGoopEventArray = makeRequest(System.getenv("ENDPNT_URL"));
         JSONArray jsonArray = new JSONArray(jsonGoopEventArray);
         for (int i = 0; i < jsonArray.length(); i++) {
             GoopEvent goopEvent = new GoopEvent();

@@ -131,6 +131,16 @@ public class SubmitView extends Div {
                 authGoopUser.setSubmissions(submissionID.toString());
             }
             else{
+
+                try{
+                    String[] subIDs = authGoopUser.getSubmissions().split(",");
+                    for (String currentsubID : subIDs) {
+                        UUID testuuid = UUID.fromString(currentsubID);
+                    }
+
+                } catch (IllegalArgumentException exception){
+                    authGoopUser.setSubmissions(submissionID.toString());
+                }
                 if(authGoopUser.getSubmissions().equals("")){
                     authGoopUser.setSubmissions(submissionID.toString());
                 }
@@ -139,6 +149,14 @@ public class SubmitView extends Div {
                         authGoopUser.setSubmissions(authGoopUser.getSubmissions() + "," + submissionID.toString());
                     }
                 }
+            }
+
+            try {
+                UUID testuuid2 = UUID.fromString(submissionID.toString());
+            } catch (IllegalArgumentException exception){
+                submissionID = UUID.randomUUID();
+                this.submissionID = submissionID;
+                authGoopUser.setSubmissions(submissionID.toString());
             }
             goopUserRepository.save(authGoopUser);
             boolean changedAudio = false;
