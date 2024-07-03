@@ -1,26 +1,13 @@
-//server.ts
 import dotenv from 'dotenv';
 import express from 'express';
-import session from 'express-session';
 import cors from 'cors';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import axios from 'axios';
+import cookieSession from 'cookie-session';
 import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
-
-
-// Declare module augmentation for express-session
-declare module 'express-session' {
-  interface SessionData {
-    user?: {
-      id: string;
-      username: string;
-      avatar: string;
-    };
-  }
-}
 
 dotenv.config();
 
@@ -39,17 +26,14 @@ const app = express();
 
 app.use(express.static(path.join(__dirname, '../../client/build')));
 
-
-// Session middleware
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'your_session_secret',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { 
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    httpOnly: true
-  }
+// Cookie-session middleware
+app.use(cookieSession({
+  name: 'session',
+  keys: [process.env.SESSION_SECRET || 'your_session_secret'],
+  maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  httpOnly: true
 }));
 
 // CORS middleware
@@ -83,30 +67,6 @@ app.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
 // Auth routes
 app.get('/auth/discord', (req, res) => {
   res.redirect(`https://discord.com/api/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&redirect_uri=${process.env.DISCORD_REDIRECT_URI}&response_type=code&scope=identify`);
-});
-
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'your_session_secret',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { 
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    httpOnly: true
-  },
-  store: new session.MemoryStore()
-}));
-
-app.use((req, res, next) => {
-  console.log('Session ID:', req.sessionID);
-  console.log('Session:', req.session);
-  next();
-});
-  // Endpoint to check if user is an admin
-app.get('/api/admins/:uid', async (req, res) => {
-    const uid = req.params.uid;
-    const adminDoc = await db.collection('admins').doc(uid).get();
-    res.json({ exists: adminDoc.exists });
 });
 
 app.get('/auth/discord/callback', async (req, res) => {
@@ -177,14 +137,8 @@ app.get('/api/user', (req, res) => {
 });
 
 app.post('/api/logout', (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      console.error('Error destroying session:', err);
-      res.status(500).json({ error: 'Logout failed' });
-    } else {
-      res.json({ message: 'Logged out successfully' });
-    }
-  });
+  req.session = null as any; // Setting session to null with type assertion
+  res.json({ message: 'Logged out successfully' });
 });
 
 app.get('/api/deadline', async (req, res) => {
@@ -223,7 +177,7 @@ app.get('/api/submission', async (req, res) => {
   }
 });
 
-//get all submissions
+// Get all submissions
 app.get('/api/submissions', async (req, res) => {
   if (!req.session.user) {
     return res.status(401).json({ error: 'Not authenticated' });
@@ -281,7 +235,7 @@ app.post('/api/submit', upload.fields([
 });
 
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../../client/build/index.html'));
+  res.sendFile(path.join(__dirname, '../../client/build/index.html'));
 });
 
 const PORT = process.env.PORT || 5001;
