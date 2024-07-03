@@ -1,7 +1,6 @@
+import 'cookie-session';
 
-import 'express-session';
-
-declare module 'express-session' {
+declare module 'cookie-session' {
   interface SessionData {
     user?: {
       id: string;

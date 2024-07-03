@@ -32,7 +32,7 @@
   },
   "scripts": {
     "start:react": "react-scripts start",
-    "start:server": "cd server && npm start",
+    "start:server": "cd .. && cd server && npm start",
     "start": "concurrently -k \"npm run start:react\" \"npm run start:server\"",
     "build": "react-scripts build",
     "test": "react-scripts test",
