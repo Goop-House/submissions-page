@@ -33,7 +33,7 @@
     "start:react": "react-scripts start",
     "start:server": "cd server && npm start",
     "start": "concurrently -k \"npm run start:react\" \"npm run start:server\"",
-    "build": "react-scripts build && mv build client/",
+    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

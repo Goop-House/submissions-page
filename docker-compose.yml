@@ -1,6 +1,7 @@
 version: '3'
 services:
   server:
+    container_name: goop-submissions-server
     build: ./server
     ports:
       - "5001:5001"
@@ -18,6 +19,7 @@ services:
       - ./uploads:/usr/src/app/uploads
 
   client:
+    container_name: goop-submissions-client
     build: ./client
     ports:
       - "80:80"
@@ -25,6 +27,7 @@ services:
       - server
 
   nginx:
+    container_name: goop-submissions-nginx
     image: nginx:alpine
     ports:
       - "443:443"
