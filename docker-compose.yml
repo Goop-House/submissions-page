@@ -32,7 +32,7 @@ services:
 
   nginx:
     container_name: goop-submissions-nginx
-    image: nginx:alpine
+    image: nginx:latest
     ports:
       - "80:80"
     volumes:
