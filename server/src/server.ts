@@ -85,24 +85,23 @@ app.get('/auth/discord', (req, res) => {
   res.redirect(`https://discord.com/api/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&redirect_uri=${process.env.DISCORD_REDIRECT_URI}&response_type=code&scope=identify`);
 });
 
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your_session_secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { 
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    httpOnly: true
+  },
+  store: new session.MemoryStore()
+}));
+
 app.use((req, res, next) => {
+  console.log('Session ID:', req.sessionID);
   console.log('Session:', req.session);
   next();
 });
-
-app.get('/api/auth/session', (req, res) => {
-    if (req.session.user) {
-        res.json(req.session.user);
-    } else {
-        res.status(401).json({ error: 'Not authenticated' });
-    }
-});
-
-// app.use((req, res, next) => {
-//     console.log('Session:', req.session);
-//     next();
-// });
-  
   // Endpoint to check if user is an admin
 app.get('/api/admins/:uid', async (req, res) => {
     const uid = req.params.uid;
@@ -114,6 +113,8 @@ app.get('/auth/discord/callback', async (req, res) => {
   const { code } = req.query;
   
   try {
+    console.log('Received Discord callback with code:', code);
+
     const tokenResponse = await axios.post('https://discord.com/api/oauth2/token', 
       new URLSearchParams({
         client_id: process.env.DISCORD_CLIENT_ID!,
@@ -130,6 +131,8 @@ app.get('/auth/discord/callback', async (req, res) => {
       }
     );
 
+    console.log('Received token response:', tokenResponse.data);
+
     const { access_token } = tokenResponse.data;
 
     const userResponse = await axios.get('https://discord.com/api/users/@me', {
@@ -138,15 +141,20 @@ app.get('/auth/discord/callback', async (req, res) => {
       },
     });
 
+    console.log('Received user data:', userResponse.data);
+
     const { id, username, avatar } = userResponse.data;
 
-    // Store user info in session
     req.session.user = { id, username, avatar };
+    
+    console.log('Set session user:', req.session.user);
+
     req.session.save((err) => {
       if (err) {
         console.error('Error saving session:', err);
         return res.status(500).send('Authentication failed');
       }
+      console.log('Session saved successfully');
       res.redirect(process.env.REACT_APP_BASE_URL || 'https://submit.goop.house');
     });
   } catch (error) {
@@ -157,9 +165,13 @@ app.get('/auth/discord/callback', async (req, res) => {
 
 // API routes
 app.get('/api/user', (req, res) => {
+  console.log('Received request for /api/user');
+  console.log('Session:', req.session);
   if (req.session.user) {
+    console.log('User found in session:', req.session.user);
     res.json(req.session.user);
   } else {
+    console.log('No user found in session');
     res.status(401).json({ error: 'Not authenticated' });
   }
 });
