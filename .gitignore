@@ -35,7 +35,7 @@ yarn-error.log*
 /client/yarn-debug.log*
 /client/yarn-error.log*
 
-/src/firebaseConfig.ts
+/client/src/firebaseConfig.ts
 
 /server/.env
 /server/.env.local
