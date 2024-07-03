@@ -22,5 +22,5 @@ COPY --from=server-build /usr/src/app/server/dist ./server/dist
 COPY --from=server-build /usr/src/app/server/package*.json ./server/
 WORKDIR /usr/src/app/server
 RUN npm install --only=production
-EXPOSE 5000
+EXPOSE 5001
 CMD ["node", "dist/server.js"]
