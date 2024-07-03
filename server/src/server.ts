@@ -51,7 +51,7 @@ app.use(session({
 const allowedOrigins = ['http://localhost:3000'];
 
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' ? 'http://localhost' : 'http://localhost:3000',
+  origin: process.env.NODE_ENV === 'production' ? 'https://submit.goop.house' : 'http://localhost:3000',
   credentials: true
 }));
 

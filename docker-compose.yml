@@ -1,12 +1,12 @@
 version: '3'
 services:
   server:
-    container_name: goop-submissions-server
+    container_name: goop-house-submissions
     build: 
-      context: ./server
+      context: .
       dockerfile: Dockerfile
     ports:
-      - "5001:5001"
+      - "80:5000"
     environment:
       - NODE_ENV=production
       - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
@@ -19,24 +19,3 @@ services:
       - REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL}
     volumes:
       - ./uploads:/usr/src/app/uploads
-
-  client:
-    container_name: goop-submissions-client
-    build:
-      context: ./client
-      dockerfile: Dockerfile
-    ports:
-      - "3000:80"
-    depends_on:
-      - server
-
-  nginx:
-    container_name: goop-submissions-nginx
-    image: nginx:latest
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx:/etc/nginx:ro
-    depends_on:
-      - client
-      - server
