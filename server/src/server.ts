@@ -51,7 +51,7 @@ app.use(session({
 const allowedOrigins = ['http://localhost:3000'];
 
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' ? 'https://submit.goop.house' : 'http://localhost:3000',
+  origin: process.env.NODE_ENV === 'production' ? process.env.REACT_APP_BASE_URL : 'http://localhost:3000',
   credentials: true
 }));
 
@@ -132,7 +132,8 @@ app.get('/auth/discord/callback', async (req, res) => {
     // Store user info in session
     req.session.user = { id, username, avatar };
 
-    res.redirect('http://localhost:3000/');
+    const redirectUrl = process.env.REACT_APP_BASE_URL || 'https://submit.goop.house';
+    res.redirect(redirectUrl);
   } catch (error) {
     console.error('Error during Discord authentication:', error);
     res.status(500).send('Authentication failed');
