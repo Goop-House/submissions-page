@@ -1,3 +1,4 @@
+//server.ts
 import dotenv from 'dotenv';
 import express from 'express';
 import session from 'express-session';
@@ -44,15 +45,20 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'your_session_secret',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: process.env.NODE_ENV === 'production' }
+  cookie: { 
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    httpOnly: true
+  }
 }));
 
 // CORS middleware
 const allowedOrigins = ['http://localhost:3000'];
-
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' ? process.env.REACT_APP_BASE_URL : 'http://localhost:3000',
-  credentials: true
+  origin: process.env.REACT_APP_BASE_URL || 'https://submit.goop.house',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json());
@@ -131,9 +137,13 @@ app.get('/auth/discord/callback', async (req, res) => {
 
     // Store user info in session
     req.session.user = { id, username, avatar };
-
-    const redirectUrl = process.env.REACT_APP_BASE_URL || 'https://submit.goop.house';
-    res.redirect(redirectUrl);
+    req.session.save((err) => {
+      if (err) {
+        console.error('Error saving session:', err);
+        return res.status(500).send('Authentication failed');
+      }
+      res.redirect(process.env.REACT_APP_BASE_URL || 'https://submit.goop.house');
+    });
   } catch (error) {
     console.error('Error during Discord authentication:', error);
     res.status(500).send('Authentication failed');
