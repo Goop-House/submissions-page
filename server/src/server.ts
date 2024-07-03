@@ -85,6 +85,11 @@ app.get('/auth/discord', (req, res) => {
   res.redirect(`https://discord.com/api/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&redirect_uri=${process.env.DISCORD_REDIRECT_URI}&response_type=code&scope=identify`);
 });
 
+app.use((req, res, next) => {
+  console.log('Session:', req.session);
+  next();
+});
+
 app.get('/api/auth/session', (req, res) => {
     if (req.session.user) {
         res.json(req.session.user);
