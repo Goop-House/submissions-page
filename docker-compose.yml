@@ -2,7 +2,9 @@ version: '3'
 services:
   server:
     container_name: goop-submissions-server
-    build: ./server
+    build: 
+      context: ./server
+      dockerfile: Dockerfile
     ports:
       - "5001:5001"
     environment:
@@ -20,21 +22,21 @@ services:
 
   client:
     container_name: goop-submissions-client
-    build: ./client
+    build:
+      context: ./client
+      dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - "3000:80"
     depends_on:
       - server
 
-  # nginx:
-  #   container_name: goop-submissions-nginx
-  #   image: nginx:alpine
-  #   ports:
-  #     - "443:443"
-  #   volumes:
-  #     - ./nginx.conf:/etc/nginx/nginx.conf:ro
-  #     - ./certbot/conf:/etc/letsencrypt
-  #     - ./certbot/www:/var/www/certbot
-  #   depends_on:
-  #     - client
-  #     - server
+  nginx:
+    container_name: goop-submissions-nginx
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx:/etc/nginx:ro
+    depends_on:
+      - client
+      - server

@@ -50,19 +50,11 @@ app.use(session({
 // CORS middleware
 const allowedOrigins = ['http://localhost:3000'];
 
-const corsOptions = {
-  origin: function (origin: any, callback: any) {
-    // Check if the incoming origin is in the allowed origins list
-    if (allowedOrigins.includes(origin) || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-};
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' ? 'http://localhost' : 'http://localhost:3000',
+  credentials: true
+}));
 
-app.use(cors(corsOptions));
 app.use(express.json());
 
 // Multer setup for file uploads
