@@ -109,14 +109,8 @@ app.get('/auth/discord/callback', async (req, res) => {
     
     console.log('Set session user:', req.session.user);
 
-    req.session.save((err) => {
-      if (err) {
-        console.error('Error saving session:', err);
-        return res.status(500).send('Authentication failed');
-      }
-      console.log('Session saved successfully');
-      res.redirect(process.env.REACT_APP_BASE_URL || 'https://submit.goop.house');
-    });
+    // Automatically saved by cookie-session, no need to manually save
+    res.redirect(process.env.REACT_APP_BASE_URL || 'https://submit.goop.house');
   } catch (error) {
     console.error('Error during Discord authentication:', error);
     res.status(500).send('Authentication failed');
