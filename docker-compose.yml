@@ -5,11 +5,9 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
-    networks:
-      goop:
-        - external: true
     ports:
       - "5001:5001"
+    network_mode: "host"
     environment:
       - NODE_ENV=production
       - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
@@ -23,11 +21,13 @@ services:
       - REDIS_URL=${REDIS_URL}
     volumes:
       - ./uploads:/usr/src/app/uploads
+    depends_on:
+      - redis
+
   redis:
-    networks:
-      goop:
-        - external: true
+    image: redis:latest
     container_name: goop-house-redis
-    image: redis
+    
     ports:
       - "6379:6379"
+    network_mode: "host"
