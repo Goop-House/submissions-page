@@ -17,5 +17,11 @@ services:
       - DISCORD_REDIRECT_URI=${DISCORD_REDIRECT_URI}
       - SESSION_SECRET=${SESSION_SECRET}
       - REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL}
+      - REDIS_URL=${REDIS_URL}
     volumes:
       - ./uploads:/usr/src/app/uploads
+  redis:
+    container_name: goop-house-redis
+    image: redis
+    ports:
+      - "6379:6379"
