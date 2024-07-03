@@ -5,6 +5,7 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
+    network-mode: host
     ports:
       - "5001:5001"
     environment:
@@ -21,6 +22,7 @@ services:
     volumes:
       - ./uploads:/usr/src/app/uploads
   redis:
+    network-mode: host
     container_name: goop-house-redis
     image: redis
     ports:
