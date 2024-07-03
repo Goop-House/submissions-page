@@ -6,7 +6,8 @@ services:
       context: .
       dockerfile: Dockerfile
     networks:
-      - goop
+      goop:
+        - external: true
     ports:
       - "5001:5001"
     environment:
@@ -24,7 +25,8 @@ services:
       - ./uploads:/usr/src/app/uploads
   redis:
     networks:
-      - goop
+      goop:
+        - external: true
     container_name: goop-house-redis
     image: redis
     ports:
