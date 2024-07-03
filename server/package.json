@@ -22,6 +22,7 @@
     "typescript": "^5.5.3"
   },
   "scripts": {
-    "start": "ts-node -r dotenv/config src/server.ts"
+    "start": "ts-node -r dotenv/config src/server.ts",
+    "build": "tsc"
   }
 }
