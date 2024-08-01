@@ -49,7 +49,6 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({ user, deadline }
     let audioPath = existingSubmission?.audio_path;
     let artPath = existingSubmission?.art_path;
 
-    // Upload audio file if provided
     if (audioFile) {
       const audioFileName = `${user.id}/${Date.now()}_${audioFile.name}`;
       const { error: audioError } = await supabase.storage
@@ -63,7 +62,6 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({ user, deadline }
       audioPath = audioFileName;
     }
 
-    // Upload art file if provided
     if (artFile) {
       const artFileName = `${user.id}/${Date.now()}_${artFile.name}`;
       const { error: artError } = await supabase.storage
@@ -77,7 +75,6 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({ user, deadline }
       }
     }
 
-    // Prepare submission data
     const submissionData = {
       user_id: user.id,
       song_name: songName,
@@ -86,7 +83,6 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({ user, deadline }
       art_path: artPath,
     };
 
-    // Insert or update submission
     let result;
     if (existingSubmission) {
       result = await supabase
@@ -104,7 +100,7 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({ user, deadline }
       alert('GOOP REJECTED. TRY AGAIN LATER.');
     } else {
       alert('GOOP RECEIVED. PROCESSING IN ALTERNATE DIMENSION.');
-      fetchExistingSubmission(); // Refresh the form with updated data
+      fetchExistingSubmission(); 
     }
   };
 
