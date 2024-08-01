@@ -1,38 +1,142 @@
-.App {
+body {
+  font-family: 'Courier New', monospace;
+  background-color: #000;
+  color: #9A00F5;
+  line-height: 1.6;
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  text-shadow: 0 0 5px #9A00F5;
+}
+
+h1 {
+  color: #9A00F5;
   text-align: center;
+  font-size: 2.5em;
+  margin-bottom: 30px;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+form {
+  background-color: rgba(154, 0, 245, 0.1);
+  padding: 20px;
+  border: 1px solid #9A00F5;
+  border-radius: 5px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+label {
+  display: block;
+  margin-top: 20px;
+  font-weight: bold;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+input[type="text"], input[type="file"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  background-color: #000;
+  border: 1px solid #9A00F5;
+  color: #9A00F5;
+  font-family: 'Courier New', monospace;
+}
+
+input[type="submit"] {
+  background-color: #9A00F5;
+  color: #000;
+  border: none;
+  padding: 10px 20px;
+  margin-top: 20px;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+}
+
+input[type="submit"]:hover {
+  background-color: #000;
+  color: #9A00F5;
+  border: 1px solid #9A00F5;
+}
+
+.goop {
+  font-size: 24px;
+  color: #9A00F5;
+  text-align: center;
+  margin-top: 20px;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+#login-button {
+  background-color: #7289da;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  margin-bottom: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+#login-status {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#countdown {
+  text-align: center;
+  font-size: 18px;
+  margin-top: 20px;
+}
+
+.ascii-art {
+  font-family: monospace;
+  white-space: pre;
+  line-height: 1;
+  text-align: center;
+  color: #9A00F5;
+  margin-bottom: 20px;
+}
+
+.admin-panel {
+  margin-top: 20px;
+}
+
+.admin-panel table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-panel th, .admin-panel td {
+  border: 1px solid #9A00F5;
+  padding: 8px;
+  text-align: left;
+}
+
+.admin-panel th {
+  background-color: rgba(154, 0, 245, 0.1);
+}
+
+.logout-button {
+  background-color: #ff4136;
   color: white;
+  border: none;
+  padding: 10px 20px;
+  margin-top: 10px;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
 }
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.logout-button:hover {
+  background-color: #ff725c;
 }
