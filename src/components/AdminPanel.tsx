@@ -7,7 +7,9 @@ interface Submission {
   id: string;
   user_id: string;
   song_name: string;
-  artist_name: string;
+  artist_name1: string;
+  artist_name2: string;
+  artist_name3: string;
   audio_path: string;
   art_path: string | null;
   created_at: string;
@@ -21,6 +23,9 @@ export const AdminPanel: React.FC = () => {
   useEffect(() => {
     fetchSubmissions();
   }, []);
+
+  const [newDeadline, setNewDeadline] = useState('');
+
 
   const fetchSubmissions = async () => {
     setLoading(true);
@@ -49,11 +54,9 @@ export const AdminPanel: React.FC = () => {
         throw error;
       }
 
-      // Create a blob from the file data
       const blob = new Blob([data], { type: 'application/octet-stream' });
       const url = window.URL.createObjectURL(blob);
       
-      // Create a temporary anchor element and trigger the download
       const a = document.createElement('a');
       a.style.display = 'none';
       a.href = url;
@@ -67,72 +70,60 @@ export const AdminPanel: React.FC = () => {
     }
   };
 
-  // const downloadAllSubmissions = async () => {
-  //   setLoading(true);
-  //   setError(null);
-  //   try {
-  //     const { data, error } = await supabase.functions.invoke('download-all-submissions', {
-  //       method: 'POST',
-  //     });
-  
-  //     if (error) throw error;
-  
-  //     // The data returned is a signed URL for the zip file
-  //     const downloadUrl = data.downloadUrl;
-  
-  //     // Create a temporary anchor element and trigger the download
-  //     const a = document.createElement('a');
-  //     a.style.display = 'none';
-  //     a.href = downloadUrl;
-  //     a.download = 'all_submissions.zip';
-  //     document.body.appendChild(a);
-  //     a.click();
-  //     document.body.removeChild(a);
-  
-  //     alert('All submissions downloaded successfully!');
-  //   } catch (error) {
-  //     console.error('Error downloading all submissions:', error);
-  //     setError('Failed to download all submissions. Please try again.');
-  //   }
-  //   setLoading(false);
-  // };
+  const shuffleArray = (array: string[]) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  };
 
-  
   const downloadAllSubmissions = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('download-all-submissions', {
-        method: 'POST',
-      });
-
-      if (error) throw error;
-
-      const submissions = data.submissions;
       const zip = new JSZip();
 
-      // Download each file and add it to the zip
-      await Promise.all(submissions.map(async (submission: { audioUrl: RequestInfo | URL; artist_name: any; song_name: any; artworkUrl: RequestInfo | URL; }) => {
-        const audioResponse = await fetch(submission.audioUrl);
-        const audioBlob = await audioResponse.blob();
-        zip.file(`${submission.artist_name} - ${submission.song_name}.mp3`, audioBlob);
+      for (const submission of submissions) {
+        const { data: audioData, error: audioError } = await supabase.storage
+          .from('audio')
+          .download(submission.audio_path);
 
-        if (submission.artworkUrl) {
-          const artworkResponse = await fetch(submission.artworkUrl);
-          const artworkBlob = await artworkResponse.blob();
-          zip.file(`${submission.artist_name} - ${submission.song_name}_artwork.jpg`, artworkBlob);
+        if (audioError) {
+          console.error(`Error downloading audio for ${submission.song_name}:`, audioError);
+          continue;
         }
-      }));
 
-      // Generate the zip file
-      const zipBlob = await zip.generateAsync({ type: 'blob' });
+        const artists = [submission.artist_name1, submission.artist_name2, submission.artist_name3]
+          .filter(name => name) // Remove empty artist names
+          .join(', ');
 
-      // Trigger the download
-      saveAs(zipBlob, 'all_submissions.zip');
+        const shuffledArtists = shuffleArray(artists.split(', ')).join(', ');
+        const fileName = `${shuffledArtists} - ${submission.song_name}.mp3`;
+
+        zip.file(fileName, audioData);
+
+        if (submission.art_path) {
+          const { data: artData, error: artError } = await supabase.storage
+            .from('artwork')
+            .download(submission.art_path);
+
+          if (artError) {
+            console.error(`Error downloading artwork for ${submission.song_name}:`, artError);
+          } else {
+            zip.file(`${shuffledArtists} - ${submission.song_name}_artwork.jpg`, artData);
+          }
+        }
+      }
+
+      const content = await zip.generateAsync({ type: 'blob' });
+      saveAs(content, 'all_submissions.zip');
 
     } catch (error) {
-      console.error('Error:', error);
-      // Handle the error (e.g., show an error message to the user)
+      console.error('Error downloading all submissions:', error);
+      setError('Failed to download all submissions. Please try again.');
     }
   };
+
+  
 
   if (loading) {
     return <div>LOADING GOOP DATA...</div>;
@@ -142,16 +133,47 @@ export const AdminPanel: React.FC = () => {
     return <div>ERROR: {error}</div>;
   }
 
+  const updateDeadline = async () => {
+    if (!newDeadline) {
+      alert('Please enter a new deadline');
+      return;
+    }
+
+    const { error } = await supabase
+      .from('settings')
+      .update({ value: newDeadline })
+      .eq('key', 'submission_deadline');
+
+    if (error) {
+      console.error('Error updating deadline:', error);
+      alert('Failed to update deadline. Please try again.');
+    } else {
+      alert('Deadline updated successfully');
+      setNewDeadline('');
+    }
+  };
+
   return (
     <div className="admin-panel">
       <h2>ADMIN PANEL</h2>
       <button type="submit" onClick={downloadAllSubmissions} disabled={loading}>
         DOWNLOAD ALL SUBMISSIONS
       </button>
+
+      <div>
+        <h3>Update Submission Deadline</h3>
+        <input
+          type="datetime-local"
+          value={newDeadline}
+          onChange={(e) => setNewDeadline(e.target.value)}
+        />
+        <button onClick={updateDeadline}>Update Deadline</button>
+      </div>
+      
       <table>
         <thead>
           <tr>
-            <th>ARTIST NAME</th>
+            <th>ARTISTS</th>
             <th>SONG NAME</th>
             <th>SUBMISSION DATE</th>
             <th>AUDIO</th>
@@ -161,17 +183,17 @@ export const AdminPanel: React.FC = () => {
         <tbody>
           {submissions.map((submission) => (
             <tr key={submission.id}>
-              <td>{submission.artist_name}</td>
+              <td>{[submission.artist_name1, submission.artist_name2, submission.artist_name3].filter(Boolean).join(', ')}</td>
               <td>{submission.song_name}</td>
               <td>{new Date(submission.created_at).toLocaleString()}</td>
               <td>
-                <button type="submit" onClick={() => downloadFile(submission.audio_path, `${submission.artist_name} - ${submission.song_name}.mp3`)}>
+                <button type="submit" onClick={() => downloadFile(submission.audio_path, `${submission.artist_name1} - ${submission.song_name}.mp3`)}>
                   DOWNLOAD
                 </button>
               </td>
               <td>
                 {submission.art_path ? (
-                  <button type="submit" onClick={() => downloadFile(submission.art_path!, `${submission.artist_name} - ${submission.song_name}_artwork.jpg`)}>
+                  <button type="submit" onClick={() => downloadFile(submission.art_path!, `${submission.artist_name1} - ${submission.song_name}_artwork.jpg`)}>
                     DOWNLOAD
                   </button>
                 ) : (

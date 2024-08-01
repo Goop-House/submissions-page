@@ -12,7 +12,7 @@ const App: React.FC = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [submissionDeadline] = useState(new Date('2025-07-01T23:59:59').getTime());
+  const [submissionDeadline, setSubmissionDeadline] = useState<number | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -27,6 +27,8 @@ const App: React.FC = () => {
       setUser(session?.user ?? null);
     });
 
+    fetchDeadline();
+
     return () => subscription.unsubscribe();
   }, []);
 
@@ -37,6 +39,20 @@ const App: React.FC = () => {
       setIsAdmin(false);
     }
   }, [user]);
+
+  const fetchDeadline = async () => {
+    const { data, error } = await supabase
+      .from('settings')
+      .select('value')
+      .eq('key', 'submission_deadline')
+      .single();
+
+    if (error) {
+      console.error('Error fetching deadline:', error);
+    } else if (data) {
+      setSubmissionDeadline(new Date(data.value).getTime());
+    }
+  };
 
   const checkAdminStatus = async (userId: string) => {
     const { data, error } = await supabase
@@ -63,7 +79,7 @@ const App: React.FC = () => {
     <div className="app">
       <header>
         <div className="ascii-art">
-          {<AsciiArt /> }
+          {<AsciiArt />}
         </div>
         <h1>GOOP HOUSE TRACK SUBMISSION</h1>
       </header>
@@ -75,9 +91,9 @@ const App: React.FC = () => {
         <button onClick={handleLogout} className="logout-button">LOGOUT</button>
       )}
 
-      <Countdown deadline={submissionDeadline} />
+      {submissionDeadline && <Countdown deadline={submissionDeadline} />}
 
-      {session && (
+      {session && submissionDeadline && (
         <SubmissionForm user={user} deadline={submissionDeadline} />
       )}
 
@@ -92,7 +108,7 @@ const App: React.FC = () => {
           <li><a href="https://discord.gg/qD2wbqqDGX">DISCORD</a></li>
           <li><a href="https://soundcloud.com/goophouse">MUSIC</a></li>
           <li><a href="https://my-store-bd8e00.creator-spring.com/">ARTIFACTS</a></li>
-      </ul>
+        </ul>
       </footer>
     </div>
   );
