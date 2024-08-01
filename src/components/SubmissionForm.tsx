@@ -112,7 +112,23 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({ user, deadline }
 
   return (
     <form id="submission-form" onSubmit={handleSubmit}>
-      {/* ... (audio and art file inputs remain the same) ... */}
+      <label htmlFor="audio">AUDIO FILE {!existingSubmission && '(REQUIRED)'}:</label>
+      <input
+        type="file"
+        id="audio"
+        name="audio"
+        accept="audio/*"
+        onChange={(e) => setAudioFile(e.target.files?.[0] || null)}
+      />
+
+      <label htmlFor="art">ARTWORK (OPTIONAL):</label>
+      <input
+        type="file"
+        id="art"
+        name="art"
+        accept="image/*"
+        onChange={(e) => setArtFile(e.target.files?.[0] || null)}
+      />
 
       <label htmlFor="song_name">SONG NAME:</label>
       <input
@@ -134,7 +150,7 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({ user, deadline }
         onChange={(e) => setArtistName1(e.target.value)}
       />
 
-      <label htmlFor="artist_name2">ARTIST NAME 2 (OPTIONAL):</label>
+      <label htmlFor="artist_name2">ARTIST NAME 2:</label>
       <input
         type="text"
         id="artist_name2"
@@ -143,7 +159,7 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({ user, deadline }
         onChange={(e) => setArtistName2(e.target.value)}
       />
 
-      <label htmlFor="artist_name3">ARTIST NAME 3 (OPTIONAL):</label>
+      <label htmlFor="artist_name3">ARTIST NAME 3:</label>
       <input
         type="text"
         id="artist_name3"
