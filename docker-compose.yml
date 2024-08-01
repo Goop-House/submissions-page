@@ -1,0 +1,9 @@
+version: '3.3'
+
+services:
+  goop-house-submissions:
+    image: gh-submissions-page:1.0
+    container_name: goop-house-submissions
+    build: .
+    ports:
+      - 3211:3211
