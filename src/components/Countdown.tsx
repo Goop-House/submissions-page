@@ -29,7 +29,7 @@ export const Countdown: React.FC<CountdownProps> = ({ deadline }) => {
   }, []);
 
   if (!timeLeft) {
-    return <div id="countdown">SUBMISSION PERIOD HAS ENDED</div>;
+    return <div id="countdown">SUBMISSION PERIOD HAS ENDED. TIME IS A CONSTRUCT.</div>;
   }
 
   return (

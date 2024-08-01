@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
+import { Upload } from 'tus-js-client';
 
 interface SubmissionFormProps {
   user: any;
@@ -14,6 +15,11 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({ user, deadline }
   const [artistName2, setArtistName2] = useState('');
   const [artistName3, setArtistName3] = useState('');
   const [existingSubmission, setExistingSubmission] = useState<any>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const projectId = 'qpovypmwxnwjaucsfujx';
+
+  const MAX_FILE_SIZE = 5 * 1024 * 1024 * 1024; // 5GB
 
   useEffect(() => {
     fetchExistingSubmission();
@@ -37,48 +43,88 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({ user, deadline }
     }
   };
 
+  const uploadFile = async (file: File, bucketName: string, fileName: string) => {
+    if (file.size > MAX_FILE_SIZE) {
+      alert('File size exceeds the maximum limit.');
+      return null;
+    }
+  
+    const { data: { session } } = await supabase.auth.getSession();
+    setIsUploading(true);
+  
+    return new Promise((resolve, reject) => {
+      const upload = new Upload(file, {
+        endpoint: `https://${projectId}.supabase.co/storage/v1/upload/resumable`,
+        retryDelays: [0, 3000, 5000, 10000, 20000],
+        headers: {
+          authorization: `Bearer ${session?.access_token}`,
+          'x-upsert': 'true',
+        },
+        uploadDataDuringCreation: true,
+        removeFingerprintOnSuccess: true,
+        metadata: {
+          bucketName: bucketName,
+          objectName: fileName,
+          contentType: file.type,
+          cacheControl: '3600',
+        },
+        chunkSize: 6 * 1024 * 1024, // 6MB
+        onError: function (error) {
+          console.log('Failed because: ' + error);
+          reject(error);
+        },
+        onProgress: function (bytesUploaded, bytesTotal) {
+          const percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2);
+          setUploadProgress(Number(percentage));
+        },
+        onSuccess: function () {
+          console.log('Download %s from %s', (upload.file as File).name, upload.url);
+          resolve(fileName);
+        },
+      });
+  
+      upload.findPreviousUploads().then(function (previousUploads) {
+        if (previousUploads.length) {
+          upload.resumeFromPreviousUpload(previousUploads[0]);
+        }
+        upload.start();
+      });
+    }).finally(() => {
+      setIsUploading(false);
+    });
+  };
+  
+  
+  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     if (new Date().getTime() > deadline) {
       alert('SUBMISSION WINDOW CLOSED. TIME IS A CONSTRUCT.');
       return;
     }
-
+  
     if (!audioFile && !existingSubmission) {
       alert('AUDIO FILE IS REQUIRED FOR NEW SUBMISSIONS.');
       return;
     }
-
+  
     let audioPath = existingSubmission?.audio_path;
     let artPath = existingSubmission?.art_path;
-
+  
     if (audioFile) {
       const audioFileName = `${user.id}/${Date.now()}_${audioFile.name}`;
-      const { error: audioError } = await supabase.storage
-        .from('audio')
-        .upload(audioFileName, audioFile, { upsert: true });
-
-      if (audioError) {
-        console.error('Error uploading audio:', audioError);
-        return;
-      }
-      audioPath = audioFileName;
+      audioPath = await uploadFile(audioFile, 'audio', audioFileName);
+      if (!audioPath) return;
     }
-
+  
     if (artFile) {
       const artFileName = `${user.id}/${Date.now()}_${artFile.name}`;
-      const { error: artError } = await supabase.storage
-        .from('artwork')
-        .upload(artFileName, artFile, { upsert: true });
-
-      if (artError) {
-        console.error('Error uploading artwork:', artError);
-      } else {
-        artPath = artFileName;
-      }
+      artPath = await uploadFile(artFile, 'artwork', artFileName);
+      if (!artPath) return;
     }
-
+  
     const submissionData = {
       user_id: user.id,
       song_name: songName,
@@ -88,7 +134,7 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({ user, deadline }
       audio_path: audioPath,
       art_path: artPath,
     };
-
+  
     let result;
     if (existingSubmission) {
       result = await supabase
@@ -100,15 +146,17 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({ user, deadline }
         .from('submissions')
         .insert([submissionData]);
     }
-
+  
     if (result.error) {
       console.error('Error saving submission:', result.error);
       alert('GOOP REJECTED. TRY AGAIN LATER.');
     } else {
       alert('GOOP RECEIVED. PROCESSING IN ALTERNATE DIMENSION.');
-      fetchExistingSubmission(); 
+      fetchExistingSubmission();
     }
   };
+  
+  
 
   return (
     <form id="submission-form" onSubmit={handleSubmit}>
@@ -169,6 +217,13 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({ user, deadline }
       />
 
       <input type="submit" value={existingSubmission ? "UPDATE THE VOID" : "SUBMIT TO THE VOID"} />
+
+      {isUploading && (
+        <div>
+          <progress value={uploadProgress} max="100">{uploadProgress}%</progress>
+          <p>Uploading... {Math.round(uploadProgress)}%</p>
+        </div>
+      )}
     </form>
   );
 };
