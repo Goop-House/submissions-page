@@ -75,7 +75,7 @@ export const AdminPanel: React.FC = () => {
 
   const downloadScript = async () => {
     try {
-      const response = await fetch('../../download_submissions.py');
+      const response = await fetch('https://github.com/Goop-House/submissions-page/blob/production/download_submissions.py');
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
