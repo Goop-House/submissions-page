@@ -85,7 +85,7 @@ export const AdminPanel: React.FC = () => {
       const a = document.createElement('a');
       a.style.display = 'none';
       a.href = url;
-      a.download = 'download_script.py';
+      a.download = 'download_submissions.py';
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
