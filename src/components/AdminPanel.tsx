@@ -73,6 +73,28 @@ export const AdminPanel: React.FC = () => {
     }
   };
 
+  const downloadScript = async () => {
+    try {
+      const response = await fetch('../../download_submissions.py');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'download_script.py';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading script:', error);
+      setError('Failed to download script. Please try again.');
+    }
+  };
+
   const updateDeadline = async () => {
     if (!newDeadline) {
       alert('Please enter a new deadline');
@@ -106,6 +128,9 @@ export const AdminPanel: React.FC = () => {
       <h2>ADMIN PANEL</h2>
       <button type="button" onClick={downloadSubmissionsJson} disabled={loading}>
         DOWNLOAD SUBMISSIONS JSON
+      </button>
+      <button type="button" onClick={downloadScript}>
+        DOWNLOAD DOWNLOADER SCRIPT
       </button>
 
       <div>
