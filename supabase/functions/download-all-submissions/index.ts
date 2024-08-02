@@ -17,16 +17,28 @@ declare global {
   }
 }
 
+const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
-  try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
-    const supabase = createClient(supabaseUrl, supabaseKey);
+  const authHeader = req.headers.get('authorization');
+  if (!authHeader) {
+    return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+  }
 
+  const token = authHeader.replace('Bearer ', '');
+  const { data: user, error } = await supabase.auth.getUser(token);
+
+  if (error || !user) {
+    return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+  }
+
+  try {
     const { data: submissions, error } = await supabase
       .from('submissions')
       .select('*');
@@ -34,26 +46,42 @@ serve(async (req) => {
     if (error) throw error;
 
     const submissionsWithUrls = await Promise.all(submissions.map(async (submission) => {
-      const audioUrl = await supabase.storage
+      const { data: audioUrl, error: audioError } = await supabase.storage
         .from('audio')
         .createSignedUrl(submission.audio_path, 3600); // 1 hour expiry
 
       let artworkUrl = null;
       if (submission.art_path) {
-        artworkUrl = await supabase.storage
+        const { data: artUrl, error: artError } = await supabase.storage
           .from('artwork')
           .createSignedUrl(submission.art_path, 3600); // 1 hour expiry
+
+        if (artError) {
+          console.error(`Error creating signed URL for artwork: ${artError}`);
+        } else {
+          artworkUrl = artUrl.signedUrl;
+        }
+      }
+
+      if (audioError) {
+        console.error(`Error creating signed URL for audio: ${audioError}`);
       }
 
       return {
         ...submission,
-        audioUrl: audioUrl.data?.signedUrl,
-        artworkUrl: (artworkUrl as { data: { signedUrl: string } } | null)?.data?.signedUrl
+        audioUrl: audioUrl.signedUrl,
+        artworkUrl: artworkUrl
       };
     }));
 
-    return new Response(JSON.stringify({ submissions: submissionsWithUrls }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" }
+    const jsonContent = JSON.stringify(submissionsWithUrls);
+
+    return new Response(jsonContent, {
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+        "Content-Disposition": "attachment; filename=submissions.json"
+      }
     });
 
   } catch (error) {

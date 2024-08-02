@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
-import JSZip from 'jszip';
-import { saveAs } from 'file-saver';
 
 interface Submission {
   id: string;
@@ -13,19 +11,19 @@ interface Submission {
   audio_path: string;
   art_path: string | null;
   created_at: string;
+  audioUrl: string;
+  artworkUrl: string | null;
 }
 
 export const AdminPanel: React.FC = () => {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [newDeadline, setNewDeadline] = useState('');
 
   useEffect(() => {
     fetchSubmissions();
   }, []);
-
-  const [newDeadline, setNewDeadline] = useState('');
-
 
   const fetchSubmissions = async () => {
     setLoading(true);
@@ -44,94 +42,36 @@ export const AdminPanel: React.FC = () => {
     setLoading(false);
   };
 
-  const downloadFile = async (path: string, fileName: string) => {
+  const downloadSubmissionsJson = async () => {
     try {
-      const { data, error } = await supabase.storage
-        .from(path.startsWith('audio') ? 'audio' : 'artwork')
-        .download(path);
+      const { data: { session } } = await supabase.auth.getSession();
+      const response = await fetch('https://qpovypmwxnwjaucsfujx.supabase.co/functions/v1/download-all-submissions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`,
+        },
+      });
 
-      if (error) {
-        throw error;
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
 
-      const blob = new Blob([data], { type: 'application/octet-stream' });
+      const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      
       const a = document.createElement('a');
       a.style.display = 'none';
       a.href = url;
-      a.download = fileName;
+      a.download = 'submissions.json';
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading file:', error);
-      alert('Failed to download file. Please try again.');
-    }
-  };
-
-  const shuffleArray = (array: string[]) => {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-  };
-
-  const downloadAllSubmissions = async () => {
-    try {
-      const zip = new JSZip();
-
-      for (const submission of submissions) {
-        const { data: audioData, error: audioError } = await supabase.storage
-          .from('audio')
-          .download(submission.audio_path);
-
-        if (audioError) {
-          console.error(`Error downloading audio for ${submission.song_name}:`, audioError);
-          continue;
-        }
-
-        const artists = [submission.artist_name1, submission.artist_name2, submission.artist_name3]
-          .filter(name => name) // Remove empty artist names
-          .join(', ');
-
-        const shuffledArtists = shuffleArray(artists.split(', ')).join(', ');
-        const fileName = `${shuffledArtists} - ${submission.song_name}.mp3`;
-
-        zip.file(fileName, audioData);
-
-        if (submission.art_path) {
-          const { data: artData, error: artError } = await supabase.storage
-            .from('artwork')
-            .download(submission.art_path);
-
-          if (artError) {
-            console.error(`Error downloading artwork for ${submission.song_name}:`, artError);
-          } else {
-            zip.file(`${shuffledArtists} - ${submission.song_name}_artwork.jpg`, artData);
-          }
-        }
-      }
-
-      const content = await zip.generateAsync({ type: 'blob' });
-      saveAs(content, 'all_submissions.zip');
 
     } catch (error) {
-      console.error('Error downloading all submissions:', error);
-      setError('Failed to download all submissions. Please try again.');
+      console.error('Error downloading submissions JSON:', error);
+      setError('Failed to download submissions JSON. Please try again.');
     }
   };
-
-  
-
-  if (loading) {
-    return <div>LOADING GOOP DATA...</div>;
-  }
-
-  if (error) {
-    return <div>ERROR: {error}</div>;
-  }
 
   const updateDeadline = async () => {
     if (!newDeadline) {
@@ -153,11 +93,19 @@ export const AdminPanel: React.FC = () => {
     }
   };
 
+  if (loading) {
+    return <div>LOADING GOOP DATA...</div>;
+  }
+
+  if (error) {
+    return <div>ERROR: {error}</div>;
+  }
+
   return (
     <div className="admin-panel">
       <h2>ADMIN PANEL</h2>
-      <button type="submit" onClick={downloadAllSubmissions} disabled={loading}>
-        DOWNLOAD ALL SUBMISSIONS
+      <button type="button" onClick={downloadSubmissionsJson} disabled={loading}>
+        DOWNLOAD SUBMISSIONS JSON
       </button>
 
       <div>
@@ -187,13 +135,13 @@ export const AdminPanel: React.FC = () => {
               <td>{submission.song_name}</td>
               <td>{new Date(submission.created_at).toLocaleString()}</td>
               <td>
-                <button type="submit" onClick={() => downloadFile(submission.audio_path, `${submission.artist_name1} - ${submission.song_name}.mp3`)}>
+                <button type="submit" onClick={() => window.open(`${supabase.storage.from('audio').getPublicUrl(submission.audio_path).data.publicUrl}`)}>
                   DOWNLOAD
                 </button>
               </td>
               <td>
                 {submission.art_path ? (
-                  <button type="submit" onClick={() => downloadFile(submission.art_path!, `${submission.artist_name1} - ${submission.song_name}_artwork.jpg`)}>
+                  <button type="submit" onClick={() => window.open(`${supabase.storage.from('artwork').getPublicUrl(submission.art_path!).data.publicUrl}`)}>
                     DOWNLOAD
                   </button>
                 ) : (

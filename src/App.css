@@ -39,7 +39,7 @@ input[type="text"], input[type="file"] {
   font-family: 'Courier New', monospace;
 }
 
-input[type="submit"] {
+input[type="submit"], button {
   background-color: #9A00F5;
   color: #000;
   border: none;
@@ -48,9 +48,28 @@ input[type="submit"] {
   cursor: pointer;
   font-family: 'Courier New', monospace;
   font-weight: bold;
+  text-transform: uppercase;
 }
 
-input[type="submit"]:hover {
+input[type="submit"]:hover, button:hover {
+  background-color: #000;
+  color: #9A00F5;
+  border: 1px solid #9A00F5;
+}
+
+input[type="dljson"], button {
+  background-color: #9A00F5;
+  color: #000;
+  border: none;
+  padding: 10px 20px;
+  margin-top: 20px;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+input[type="dljson"]:hover, button:hover {
   background-color: #000;
   color: #9A00F5;
   border: 1px solid #9A00F5;
@@ -162,4 +181,50 @@ progress::-webkit-progress-value {
 
 progress::-moz-progress-bar {
   background-color: #9A00F5;
+}
+
+/* Styles for buttons */
+input[type="file"]::file-selector-button {
+  background-color: #9A00F5;
+  color: #000;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background-color: #000;
+  color: #9A00F5;
+  border: 1px solid #9A00F5;
+}
+
+button#download-json, button#update-deadline, button.download {
+  background-color: #9A00F5;
+  color: #000;
+  border: none;
+  padding: 10px 20px;
+  margin-top: 20px;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+button#download-json:hover, button#update-deadline:hover, button.download:hover {
+  background-color: #000;
+  color: #9A00F5;
+  border: 1px solid #9A00F5;
+}
+
+input[type="datetime-local"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  background-color: #000;
+  border: 1px solid #9A00F5;
+  color: #9A00F5;
+  font-family: 'Courier New', monospace;
 }
