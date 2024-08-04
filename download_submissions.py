@@ -23,7 +23,7 @@ def download_file(url, path):
 
 # Iterate through the submissions and download the files
 for submission in submissions:
-    artists = [submission['artist_name1'], submission['artist_name2'], submission['artist_name3']]
+    artists = [submission['artist_name1'], submission['artist_name2'], submission['artist_name3'], submission['artist_name4']]
     artists = [artist for artist in artists if artist]  # Remove empty artist names
     random.shuffle(artists)
     artists_str = ', '.join(artists)

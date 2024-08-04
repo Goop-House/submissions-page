@@ -14,15 +14,17 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({ user, deadline }
   const [artistName1, setArtistName1] = useState('');
   const [artistName2, setArtistName2] = useState('');
   const [artistName3, setArtistName3] = useState('');
+  const [artistName4, setArtistName4] = useState('');
   const [existingSubmission, setExistingSubmission] = useState<any>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [totalLengthError, setTotalLengthError] = useState('');
+  const [emojiError, setEmojiError] = useState('');
   const projectId = 'qpovypmwxnwjaucsfujx';
 
   const MAX_AUDIO_FILE_SIZE = 1000 * 1024 * 1024;
   const MAX_ART_FILE_SIZE = 30 * 1024 * 1024;
-  const MAX_COMBINED_LENGTH = 250;
+  const MAX_COMBINED_LENGTH = 90;
 
   useEffect(() => {
     fetchExistingSubmission();
@@ -42,6 +44,7 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({ user, deadline }
         setArtistName1(data.artist_name1 || '');
         setArtistName2(data.artist_name2 || '');
         setArtistName3(data.artist_name3 || '');
+        setArtistName4(data.artist_name4 || '');
       }
     }
   };
@@ -102,8 +105,19 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({ user, deadline }
   };
 
   const handleChange = (setter: React.Dispatch<React.SetStateAction<string>>, field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setter(e.target.value);
-    validateTotalLength(field, e.target.value);
+    const value = e.target.value;
+    if (containsEmoji(value)) {
+      setEmojiError('Emojis are not allowed.');
+    } else {
+      setEmojiError('');
+      setter(value);
+      validateTotalLength(field, value);
+    }
+  };
+
+  const containsEmoji = (text: string) => {
+    const emojiRegex = /[\uD83C-\uDBFF\uDC00-\uDFFF]+/g;
+    return emojiRegex.test(text);
   };
 
   const validateTotalLength = (field: string, value: string) => {
@@ -112,9 +126,10 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({ user, deadline }
       artistName1: artistName1.length,
       artistName2: artistName2.length,
       artistName3: artistName3.length,
+      artistName4: artistName4.length,
       [field]: value.length
     };
-    const totalLength = lengths.songName + lengths.artistName1 + lengths.artistName2 + lengths.artistName3;
+    const totalLength = lengths.songName + lengths.artistName1 + lengths.artistName2 + lengths.artistName3 + lengths.artistName4;
     if (totalLength > MAX_COMBINED_LENGTH) {
       setTotalLengthError(`Combined length of all fields cannot exceed ${MAX_COMBINED_LENGTH} characters.`);
     } else {
@@ -135,8 +150,22 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({ user, deadline }
       return;
     }
 
-    if (totalLengthError) {
-      alert(totalLengthError);
+    if (totalLengthError || emojiError) {
+      alert(totalLengthError || emojiError);
+      return;
+    }
+
+    // Additional file type checks
+    const validAudioTypes = ['audio/mpeg', 'audio/wav', 'audio/mp3'];
+    const validArtTypes = ['image/jpeg', 'image/png', 'image/gif'];
+
+    if (audioFile && !validAudioTypes.includes(audioFile.type)) {
+      alert('Invalid audio file type.');
+      return;
+    }
+
+    if (artFile && !validArtTypes.includes(artFile.type)) {
+      alert('Invalid artwork file type.');
       return;
     }
 
@@ -161,6 +190,7 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({ user, deadline }
       artist_name1: artistName1,
       artist_name2: artistName2,
       artist_name3: artistName3,
+      artist_name4: artistName4,
       audio_path: audioPath,
       art_path: artPath,
     };
@@ -181,7 +211,6 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({ user, deadline }
       console.error('Error saving submission:', result.error);
       alert('GOOP REJECTED. TRY AGAIN LATER.');
     } else {
-      
       fetchExistingSubmission();
       // Clear the file inputs after submission
       setAudioFile(null);
@@ -255,7 +284,18 @@ export const SubmissionForm: React.FC<SubmissionFormProps> = ({ user, deadline }
         onChange={handleChange(setArtistName3, 'artistName3')}
       />
 
+      <label htmlFor="artist_name4">ARTIST NAME 4:</label>
+      <input
+        type="text"
+        id="artist_name4"
+        name="artist_name4"
+        maxLength={254}
+        value={artistName4}
+        onChange={handleChange(setArtistName4, 'artistName4')}
+      />
+
       {totalLengthError && <p style={{ color: 'red' }}>{totalLengthError}</p>}
+      {emojiError && <p style={{ color: 'red' }}>{emojiError}</p>}
 
       <input type="submit" value={existingSubmission ? "UPDATE THE VOID" : "SUBMIT TO THE VOID"} />
 

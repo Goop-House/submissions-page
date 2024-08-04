@@ -8,6 +8,7 @@ interface Submission {
   artist_name1: string;
   artist_name2: string;
   artist_name3: string;
+  artist_name4: string;
   audio_path: string;
   art_path: string | null;
   created_at: string;
@@ -156,7 +157,7 @@ export const AdminPanel: React.FC = () => {
         <tbody>
           {submissions.map((submission) => (
             <tr key={submission.id}>
-              <td>{[submission.artist_name1, submission.artist_name2, submission.artist_name3].filter(Boolean).join(', ')}</td>
+              <td>{[submission.artist_name1, submission.artist_name2, submission.artist_name3, submission.artist_name4].filter(Boolean).join(', ')}</td>
               <td>{submission.song_name}</td>
               <td>{new Date(submission.created_at).toLocaleString()}</td>
               <td>
