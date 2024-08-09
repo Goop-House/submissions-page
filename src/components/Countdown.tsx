@@ -1,14 +1,23 @@
 import React, { useState, useEffect } from 'react';
 
 interface CountdownProps {
-  deadline: number;
+  deadline: number; // This should be the deadline in PST timezone, as a timestamp
 }
 
 export const Countdown: React.FC<CountdownProps> = ({ deadline }) => {
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
   function calculateTimeLeft() {
-    const difference = deadline - new Date().getTime();
+    // Create a new Date object with the deadline
+    const deadlineDate = new Date(deadline);
+
+    // Convert the deadline to PST
+    const pstDeadline = new Date(deadlineDate.toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
+
+    // Get the current time in PST
+    const now = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
+
+    const difference = pstDeadline.getTime() - now.getTime();
     if (difference > 0) {
       return {
         days: Math.floor(difference / (1000 * 60 * 60 * 24)),
