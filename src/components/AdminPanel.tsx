@@ -102,9 +102,12 @@ export const AdminPanel: React.FC = () => {
       return;
     }
 
+    // Convert the new deadline to a UTC timestamp
+    const utcDeadline = new Date(newDeadline).toISOString();
+
     const { error } = await supabase
       .from('settings')
-      .update({ value: newDeadline })
+      .update({ value: utcDeadline })
       .eq('key', 'submission_deadline');
 
     if (error) {
@@ -159,7 +162,7 @@ export const AdminPanel: React.FC = () => {
             <tr key={submission.id}>
               <td>{[submission.artist_name1, submission.artist_name2, submission.artist_name3, submission.artist_name4].filter(Boolean).join(', ')}</td>
               <td>{submission.song_name}</td>
-              <td>{new Date(submission.created_at).toLocaleString()}</td>
+              <td>{new Date(submission.created_at).toLocaleString('en-US', { timeZone: 'UTC' })}</td>
               <td>
                 <button type="submit" onClick={() => window.open(`${supabase.storage.from('audio').getPublicUrl(submission.audio_path).data.publicUrl}`)}>
                   DOWNLOAD

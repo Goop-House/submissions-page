@@ -50,7 +50,9 @@ const App: React.FC = () => {
     if (error) {
       console.error('Error fetching deadline:', error);
     } else if (data) {
-      setSubmissionDeadline(new Date(data.value).getTime());
+      // Interpret the deadline as a UTC timestamp
+      const utcDeadline = Date.parse(data.value + "Z"); // Ensure the deadline is treated as UTC by appending "Z"
+      setSubmissionDeadline(utcDeadline);
     }
   };
 
