@@ -45,36 +45,48 @@ serve(async (req) => {
 
     if (error) throw error;
 
+    const failedSubmissions: string[] = [];
+
     const submissionsWithUrls = await Promise.all(submissions.map(async (submission) => {
-      const { data: audioUrl, error: audioError } = await supabase.storage
-        .from('audio')
-        .createSignedUrl(submission.audio_path, 3600); // 1 hour expiry
+      try {
+        const { data: audioUrl, error: audioError } = await supabase.storage
+          .from('audio')
+          .createSignedUrl(submission.audio_path, 3600); // 1 hour expiry
 
-      let artworkUrl = null;
-      if (submission.art_path) {
-        const { data: artUrl, error: artError } = await supabase.storage
-          .from('artwork')
-          .createSignedUrl(submission.art_path, 3600); // 1 hour expiry
-
-        if (artError) {
-          console.error(`Error creating signed URL for artwork: ${artError}`);
-        } else {
-          artworkUrl = artUrl.signedUrl;
+        if (audioError) {
+          console.error(`Error creating signed URL for audio: ${audioError}`);
+          throw new Error('Audio URL generation failed');
         }
-      }
 
-      if (audioError) {
-        console.error(`Error creating signed URL for audio: ${audioError}`);
-      }
+        let artworkUrl = null;
+        if (submission.art_path) {
+          const { data: artUrl, error: artError } = await supabase.storage
+            .from('artwork')
+            .createSignedUrl(submission.art_path, 3600); // 1 hour expiry
 
-      return {
-        ...submission,
-        audioUrl: audioUrl.signedUrl,
-        artworkUrl: artworkUrl
-      };
+          if (artError) {
+            console.error(`Error creating signed URL for artwork: ${artError}`);
+            throw new Error('Artwork URL generation failed');
+          } else {
+            artworkUrl = artUrl.signedUrl;
+          }
+        }
+
+        return {
+          ...submission,
+          audioUrl: audioUrl.signedUrl,
+          artworkUrl: artworkUrl
+        };
+
+      } catch (err) {
+        failedSubmissions.push(submission.id);
+        console.error(`Failed submission ID: ${submission.id}`, err);
+        return null;
+      }
     }));
 
-    const jsonContent = JSON.stringify(submissionsWithUrls);
+    const successfulSubmissions = submissionsWithUrls.filter(Boolean);
+    const jsonContent = JSON.stringify(successfulSubmissions);
 
     return new Response(jsonContent, {
       headers: {
