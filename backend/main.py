@@ -10,8 +10,13 @@ class Submission(BaseModel):
     artist_name4: str | None = None
     song_name: str
     user_id: str
-    art_path: str | None = None
-    song_path: str 
+
+class UpdateSubmission(BaseModel):
+    artist_name1: str | None = None
+    artist_name2: str | None = None
+    artist_name3: str | None = None
+    artist_name4: str | None = None
+    song_name: str | None = None
 
 submissions = {}   
 counter_id = 0
@@ -22,12 +27,12 @@ counter_id = 0
 @app.post("/submissions")
 async def create_submission(submission: Submission, file: UploadFile):
     global counter_id
-    if (file.content_type != "wav" & file.content_type != "mp3" & file.content_type != "mpeg"):
-        raise HTTPException(status_code = 422, detail = "Invalid audio file type (.wav, .mp3, .mpeg accepted)")
+    if (file.content_type != "audio/mpeg" and file.content_type != "audio/wav"):
+        raise HTTPException(status_code = 422, detail = "Invalid audio file type")
     submissions.update({counter_id: submission})
     new_id = counter_id
     counter_id += 1
-    return ("New submission of ID ", new_id, " created with file", file.filename)
+    return ( new_id, " created with file", file.filename)
     
     
 
@@ -45,12 +50,17 @@ async def get_submission(submission_id: int):
 
 #update
 @app.patch("/submissions/{submission_id}")
-async def update_submission(submission_id: int, updatedSubmission: Submission, file: UploadFile | None = None):
-    if (file.content_type != "wav" & file.content_type != "mp3" & file.content_type != "mpeg"):
-        raise HTTPException(status_code = 422, detail = "Invalid audio file type (.wav, .mp3, .mpeg accepted)")
+async def update_submission(submission_id: int, updatedSubmission: UpdateSubmission, file: UploadFile | None = None):
+    if (file != None):
+        if (file.content_type != "audio/mpeg" and file.content_type != "audio/wav"):
+            raise HTTPException(status_code = 422, detail = "Invalid audio file type")
+        
     if (submission_id not in submissions):
         raise HTTPException(status_code = 404, detail = "Submission ID not found")
-    submissions[submission_id] = updatedSubmission
+    
+    existing = submissions[submission_id]
+    updated = existing.model_copy(update = updatedSubmission.model_dump(exclude_unset = True))
+    submissions[submission_id] = updated
 
 #delete
 @app.delete ("/submissions/{submission_id}")
